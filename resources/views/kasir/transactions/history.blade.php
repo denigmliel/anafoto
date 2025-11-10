@@ -59,6 +59,7 @@
 @endpush
 
 @section('content')
+    @php($displayTimezone = config('app.timezone_display', 'Asia/Jakarta'))
     <h1 class="page-title">Riwayat Transaksi</h1>
 
     <div class="card">
@@ -111,7 +112,7 @@
                     @foreach ($transactions as $transaction)
                         <tr>
                             <td>{{ $transaction->code }}</td>
-                            <td>{{ $transaction->transaction_date->format('d/m/Y H:i') }}</td>
+                            <td>{{ $transaction->transaction_date->timezone($displayTimezone)->format('d/m/Y H:i:s') }}</td>
                             <td>
                                 <span class="badge">{{ ucfirst($transaction->payment_method) }}</span>
                             </td>
