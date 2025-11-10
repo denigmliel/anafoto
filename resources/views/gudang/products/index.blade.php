@@ -228,6 +228,7 @@
                     <select
                         name="category_id"
                         id="category_id"
+                        data-searchable-select
                     >
                         <option value="">Semua</option>
                         @foreach ($categories as $category)
@@ -324,3 +325,65 @@
         @endif
     </div>
 @endsection
+
+@push('scripts')
+    <script>
+        (function () {
+            const RESET_DELAY = 800;
+            const searchableSelects = document.querySelectorAll('select[data-searchable-select]');
+
+            searchableSelects.forEach(function (selectElement) {
+                let buffer = '';
+                let timerId = null;
+
+                function resetBuffer() {
+                    buffer = '';
+                    if (timerId) {
+                        clearTimeout(timerId);
+                        timerId = null;
+                    }
+                }
+
+                selectElement.addEventListener('keydown', function (event) {
+                    if (event.ctrlKey || event.altKey || event.metaKey) {
+                        return;
+                    }
+
+                    if (event.key === 'Backspace') {
+                        buffer = buffer.slice(0, -1);
+                        event.preventDefault();
+                    } else if (event.key === 'Escape') {
+                        resetBuffer();
+                        return;
+                    } else if (event.key.length === 1) {
+                        buffer += event.key;
+                        event.preventDefault();
+                    } else {
+                        return;
+                    }
+
+                    if (timerId) {
+                        clearTimeout(timerId);
+                    }
+                    timerId = setTimeout(resetBuffer, RESET_DELAY);
+
+                    const searchTerm = buffer.trim().toLowerCase();
+                    if (!searchTerm) {
+                        return;
+                    }
+
+                    const match = Array.from(selectElement.options).find(function (option) {
+                        return option.value !== '' && option.text.toLowerCase().includes(searchTerm);
+                    });
+
+                    if (match) {
+                        selectElement.value = match.value;
+                        selectElement.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
+                });
+
+                selectElement.addEventListener('blur', resetBuffer);
+            });
+        })();
+    </script>
+@endpush

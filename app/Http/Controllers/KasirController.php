@@ -20,6 +20,7 @@ class KasirController extends Controller
 {
     private const UNIT_STOCK_MULTIPLIERS = [
         'PACK' => 10,
+        'BOX' => 6,
         'LUSIN' => 12,
     ];
 

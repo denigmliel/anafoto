@@ -15,7 +15,7 @@ use Illuminate\Validation\ValidationException;
 
 class GudangController extends Controller
 {
-    private const ALLOWED_UNIT_NAMES = ['PCS', 'PACK', 'RIM', 'BALL', 'LEMBAR', 'LUSIN'];
+    private const ALLOWED_UNIT_NAMES = ['PCS', 'PACK', 'BOX', 'RIM', 'LEMBAR', 'LUSIN'];
     private const LOW_STOCK_THRESHOLD = 5;
 
     public function dashboard()

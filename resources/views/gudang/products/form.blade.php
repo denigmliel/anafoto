@@ -404,7 +404,7 @@
     @php
         $allowedUnits = isset($allowedUnits)
             ? array_values(array_map('strtoupper', $allowedUnits))
-            : ['PCS', 'PACK', 'RIM', 'BALL', 'LUSIN'];
+            : ['PCS', 'PACK', 'BOX', 'RIM', 'LEMBAR', 'LUSIN'];
 
         $existingUnits = $product->relationLoaded('units')
             ? $product->units->map(function ($unit) {
