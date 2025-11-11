@@ -18,16 +18,18 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f5f7fb;
             color: #1d2939;
+            --sidebar-width: 220px;
         }
 
         body {
             margin: 0;
+            overflow-x: auto;
         }
 
         .layout {
             min-height: 100vh;
             display: grid;
-            grid-template-columns: 200px minmax(0, 1fr);
+            grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
         }
 
         .sidebar {
@@ -42,6 +44,7 @@
             top: 0;
             height: 100vh;
             overflow-y: auto;
+            width: var(--sidebar-width);
         }
 
         .brand {
@@ -144,7 +147,7 @@
 
         .content {
             background-color: #f5f7fb;
-            padding: 24px 28px;
+            padding: 24px clamp(18px, 3vw, 32px);
             display: flex;
             flex-direction: column;
             width: 100%;
@@ -280,9 +283,9 @@
 
         .main-content {
             flex: 1;
-            max-width: 1180px;
             width: 100%;
-            margin: 0 auto;
+            max-width: none;
+            margin: 0;
         }
 
         .page-title {
@@ -352,27 +355,24 @@
             font-size: 13px;
         }
 
+        @media (max-width: 1200px) {
+            :root {
+                --sidebar-width: 204px;
+            }
+        }
+
         @media (max-width: 1024px) {
-            .layout {
-                grid-template-columns: 1fr;
+            :root {
+                --sidebar-width: 192px;
             }
 
             .sidebar {
-                position: static;
-                height: auto;
-                flex-direction: column;
-                align-items: stretch;
-                padding: 18px;
-                gap: 18px;
+                padding: 18px 14px;
+                gap: 20px;
             }
 
             .sidebar-top {
                 gap: 18px;
-            }
-
-            .sidebar-bottom {
-                width: 100%;
-                margin-top: 0;
             }
 
             .sidebar-sections {
@@ -383,14 +383,6 @@
                 padding: 0 14px 14px;
             }
 
-            .logout-form {
-                width: auto;
-            }
-
-            .logout-button {
-                width: auto;
-            }
-
             .content {
                 padding: 20px 16px;
             }
@@ -398,6 +390,26 @@
             .main-content {
                 margin: 0;
                 max-width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            :root {
+                --sidebar-width: 180px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            :root {
+                --sidebar-width: 170px;
+            }
+
+            .sidebar {
+                padding: 18px 12px;
+            }
+
+            .content {
+                padding: 18px 14px;
             }
         }
     </style>

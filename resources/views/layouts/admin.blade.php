@@ -19,16 +19,18 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f5f6fb;
             color: #172033;
+            --sidebar-width: 220px;
         }
 
         body {
             margin: 0;
+            overflow-x: auto;
         }
 
         .layout {
             min-height: 100vh;
             display: grid;
-            grid-template-columns: 200px minmax(0, 1fr);
+            grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
         }
 
         .sidebar {
@@ -42,6 +44,7 @@
             top: 0;
             height: 100vh;
             overflow-y: auto;
+            width: var(--sidebar-width);
         }
 
         .brand {
@@ -142,7 +145,7 @@
 
         .content {
             background-color: #f5f6fb;
-            padding: 24px 28px;
+            padding: 24px clamp(18px, 3vw, 32px);
             display: flex;
             flex-direction: column;
             width: 100%;
@@ -199,9 +202,9 @@
 
         .main-content {
             flex: 1;
-            max-width: 1180px;
             width: 100%;
-            margin: 0 auto;
+            max-width: none;
+            margin: 0;
         }
 
         .flash {
@@ -251,20 +254,20 @@
             font-size: 13px;
         }
 
+        @media (max-width: 1200px) {
+            :root {
+                --sidebar-width: 204px;
+            }
+        }
+
         @media (max-width: 1024px) {
-            .layout {
-                grid-template-columns: 1fr;
+            :root {
+                --sidebar-width: 190px;
             }
 
             .sidebar {
-                position: static;
-                height: auto;
-                overflow-y: visible;
-                flex-direction: column;
-                align-items: stretch;
-                justify-content: flex-start;
-                padding: 20px 18px;
-                gap: 18px;
+                padding: 20px 14px;
+                gap: 20px;
             }
 
             .sidebar-sections {
@@ -282,6 +285,12 @@
             .main-content {
                 margin: 0;
                 max-width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            :root {
+                --sidebar-width: 178px;
             }
         }
     </style>

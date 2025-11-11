@@ -303,24 +303,29 @@
             }
         }
 
-        .product-select-wrapper {
+        .product-select-wrapper,
+        .category-select-wrapper {
             position: relative;
         }
 
-        .product-select-wrapper .product-search-input {
+        .product-select-wrapper .product-search-input,
+        .category-select-wrapper .category-search-input {
             display: none;
             margin-bottom: 8px;
         }
 
-        .product-select-wrapper--enhanced .product-search-input {
+        .product-select-wrapper--enhanced .product-search-input,
+        .category-select-wrapper--enhanced .category-search-input {
             display: block;
         }
 
-        .product-select-wrapper--enhanced .product-select {
+        .product-select-wrapper--enhanced .product-select,
+        .category-select-wrapper--enhanced .category-select {
             display: none;
         }
 
-        .product-suggestions {
+        .product-suggestions,
+        .category-suggestions {
             position: absolute;
             top: calc(100% + 4px);
             left: 0;
@@ -336,11 +341,13 @@
             z-index: 30;
         }
 
-        .product-suggestions.is-visible {
+        .product-suggestions.is-visible,
+        .category-suggestions.is-visible {
             display: block;
         }
 
-        .product-suggestion {
+        .product-suggestion,
+        .category-suggestion {
             width: 100%;
             padding: 8px 10px;
             background: transparent;
@@ -352,23 +359,28 @@
         }
 
         .product-suggestion:hover,
-        .product-suggestion.is-active {
+        .product-suggestion.is-active,
+        .category-suggestion:hover,
+        .category-suggestion.is-active {
             background-color: #f1f5ff;
         }
 
-        .product-suggestion-label {
+        .product-suggestion-label,
+        .category-suggestion-label {
             font-size: 13px;
             font-weight: 600;
             color: #1f2937;
         }
 
-        .product-suggestion-meta {
+        .product-suggestion-meta,
+        .category-suggestion-meta {
             margin-top: 2px;
             font-size: 12px;
             color: #6b7280;
         }
 
-        .product-suggestion-empty {
+        .product-suggestion-empty,
+        .category-suggestion-empty {
             font-size: 13px;
             color: #6b7280;
             padding: 8px 10px;
@@ -562,21 +574,43 @@
                                     <div class="item-row">
                                         <div class="item-cell item-cell--category">
                                             <div class="item-cell-label">Kategori</div>
-                                            <select
-                                                name="items[{{ $index }}][category_id]"
-                                                class="form-select category-select"
-                                            >
-                                                <option value="">Semua Kategori</option>
-                                                <option value="uncategorized" @selected($categoryValue === 'uncategorized')>Tanpa Kategori</option>
-                                                @foreach ($categories as $category)
-                                                    <option
-                                                        value="{{ $category->id }}"
-                                                        @selected($categoryValue === (string) $category->id)
-                                                    >
-                                                        {{ $category->name }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
+                                            @php
+                                                $categoryLabel = '';
+                                                if ($categoryValue === 'uncategorized') {
+                                                    $categoryLabel = 'Tanpa Kategori';
+                                                } else {
+                                                    $matchedCategory = collect($categories)->firstWhere('id', (int) $categoryValue);
+                                                    $categoryLabel = $matchedCategory ? $matchedCategory->name : '';
+                                                }
+                                            @endphp
+                                            <div class="category-select-wrapper">
+                                                <input
+                                                    type="search"
+                                                    class="form-control category-search-input"
+                                                    placeholder="Cari kategori..."
+                                                    autocomplete="off"
+                                                    value="{{ $categoryLabel }}"
+                                                    @if ($categoryLabel !== '')
+                                                        title="{{ $categoryLabel }}"
+                                                    @endif
+                                                >
+                                                <select
+                                                    name="items[{{ $index }}][category_id]"
+                                                    class="form-select category-select"
+                                                >
+                                                    <option value="">Semua Kategori</option>
+                                                    <option value="uncategorized" @selected($categoryValue === 'uncategorized')>Tanpa Kategori</option>
+                                                    @foreach ($categories as $category)
+                                                        <option
+                                                            value="{{ $category->id }}"
+                                                            @selected($categoryValue === (string) $category->id)
+                                                        >
+                                                            {{ $category->name }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                <div class="category-suggestions"></div>
+                                            </div>
                                         </div>
                                         <div class="item-cell item-cell--product">
                                             <div class="item-cell-label">Produk</div>
@@ -721,13 +755,23 @@
         <div class="item-row">
             <div class="item-cell item-cell--category">
                 <div class="item-cell-label">Kategori</div>
-                <select data-name="items[INDEX][category_id]" class="form-select category-select">
-                    <option value="">Semua Kategori</option>
-                    <option value="uncategorized">Tanpa Kategori</option>
-                    @foreach ($categories as $category)
-                        <option value="{{ $category->id }}">{{ $category->name }}</option>
-                    @endforeach
-                </select>
+                <div class="category-select-wrapper">
+                    <input
+                        type="search"
+                        class="form-control category-search-input"
+                        placeholder="Cari kategori..."
+                        autocomplete="off"
+                        value=""
+                    >
+                    <select data-name="items[INDEX][category_id]" class="form-select category-select">
+                        <option value="">Semua Kategori</option>
+                        <option value="uncategorized">Tanpa Kategori</option>
+                        @foreach ($categories as $category)
+                            <option value="{{ $category->id }}">{{ $category->name }}</option>
+                        @endforeach
+                    </select>
+                    <div class="category-suggestions"></div>
+                </div>
             </div>
             <div class="item-cell item-cell--product">
                 <div class="item-cell-label">Produk</div>
@@ -1170,6 +1214,261 @@
                 select.dataset.typeaheadInitialized = '1';
             }
 
+            function enableCategorySearch(row, select) {
+                if (!row || !select) {
+                    return;
+                }
+
+                const wrapper = row.querySelector('.category-select-wrapper');
+                const searchInput = wrapper ? wrapper.querySelector('.category-search-input') : null;
+                const suggestions = wrapper ? wrapper.querySelector('.category-suggestions') : null;
+
+                if (!wrapper || !searchInput || !suggestions || searchInput.dataset.searchInitialized === '1') {
+                    return;
+                }
+
+                wrapper.classList.add('category-select-wrapper--enhanced');
+                searchInput.dataset.searchInitialized = '1';
+                row._categorySuggestions = suggestions;
+
+                let suggestionButtons = [];
+                let highlightedIndex = -1;
+                let repositionActive = false;
+
+                const ensureSuggestionsPortal = () => {
+                    if (!suggestions || suggestions.dataset.portaled === '1') {
+                        return;
+                    }
+                    suggestions.dataset.portaled = '1';
+                    document.body.appendChild(suggestions);
+                    suggestions.style.position = 'absolute';
+                };
+
+                const positionSuggestions = () => {
+                    if (!suggestions || suggestions.dataset.isVisible !== '1') {
+                        return;
+                    }
+                    const rect = searchInput.getBoundingClientRect();
+                    suggestions.style.width = `${rect.width}px`;
+                    suggestions.style.left = `${rect.left + window.scrollX}px`;
+                    suggestions.style.top = `${rect.bottom + 4 + window.scrollY}px`;
+                };
+
+                const handleViewportChange = () => {
+                    positionSuggestions();
+                };
+
+                const enableReposition = () => {
+                    if (repositionActive) {
+                        return;
+                    }
+                    repositionActive = true;
+                    window.addEventListener('resize', handleViewportChange);
+                    window.addEventListener('scroll', handleViewportChange, true);
+                };
+
+                const disableReposition = () => {
+                    if (!repositionActive) {
+                        return;
+                    }
+                    repositionActive = false;
+                    window.removeEventListener('resize', handleViewportChange);
+                    window.removeEventListener('scroll', handleViewportChange, true);
+                };
+
+                const formatOptionLabel = (option) => (option ? (option.textContent || '').trim() : '');
+
+                const closeSuggestions = () => {
+                    suggestions.innerHTML = '';
+                    suggestions.classList.remove('is-visible');
+                    suggestions.dataset.isVisible = '0';
+                    suggestions.style.display = 'none';
+                    highlightedIndex = -1;
+                    suggestionButtons = [];
+                    disableReposition();
+                };
+
+                const highlightSuggestion = (index) => {
+                    if (!suggestionButtons.length) {
+                        highlightedIndex = -1;
+                        return;
+                    }
+
+                    const maxIndex = suggestionButtons.length - 1;
+                    let nextIndex = index;
+
+                    if (index < 0) {
+                        nextIndex = maxIndex;
+                    } else if (index > maxIndex) {
+                        nextIndex = 0;
+                    }
+
+                    suggestionButtons.forEach((button) => button.classList.remove('is-active'));
+
+                    const button = suggestionButtons[nextIndex];
+                    if (button) {
+                        button.classList.add('is-active');
+                        button.scrollIntoView({ block: 'nearest' });
+                        highlightedIndex = nextIndex;
+                    }
+                };
+
+                const selectOption = (option) => {
+                    if (!option) {
+                        return;
+                    }
+
+                    if (select.value !== option.value) {
+                        select.value = option.value;
+                        select.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
+
+                    const label = option.value ? formatOptionLabel(option) : '';
+                    searchInput.value = label;
+                    if (label) {
+                        searchInput.title = label;
+                    } else {
+                        searchInput.removeAttribute('title');
+                    }
+                    closeSuggestions();
+                };
+
+                const renderSuggestions = (query) => {
+                    ensureSuggestionsPortal();
+                    const normalized = query.trim().toLowerCase();
+                    const options = Array.from(select.options).filter((option) => !option.disabled);
+
+                    const matches = options.filter((option) => {
+                        if (!normalized) {
+                            return true;
+                        }
+                        return formatOptionLabel(option).toLowerCase().includes(normalized);
+                    });
+
+                    suggestions.innerHTML = '';
+
+                    if (!matches.length) {
+                        const empty = document.createElement('div');
+                        empty.className = 'category-suggestion-empty';
+                        empty.textContent = 'Kategori tidak ditemukan';
+                        suggestions.appendChild(empty);
+                        suggestionButtons = [];
+                        highlightedIndex = -1;
+                    } else {
+                        matches.forEach((option) => {
+                            const button = document.createElement('button');
+                            button.type = 'button';
+                            button.className = 'category-suggestion';
+                            button.dataset.optionIndex = option.index;
+                            button.innerHTML = `
+                                <div class="category-suggestion-label">${formatOptionLabel(option)}</div>
+                            `;
+
+                            button.addEventListener('mousedown', (event) => {
+                                event.preventDefault();
+                                selectOption(option);
+                            });
+
+                            suggestions.appendChild(button);
+                        });
+                        suggestionButtons = Array.from(suggestions.querySelectorAll('.category-suggestion'));
+                        highlightedIndex = -1;
+                    }
+
+                    suggestions.classList.add('is-visible');
+                    suggestions.dataset.isVisible = '1';
+                    suggestions.style.display = 'block';
+                    positionSuggestions();
+                    enableReposition();
+                };
+
+                const syncInputWithSelection = () => {
+                    const selectedOption = select.options[select.selectedIndex];
+                    const label = selectedOption && selectedOption.value ? formatOptionLabel(selectedOption) : '';
+                    if (searchInput.value !== label) {
+                        searchInput.value = label;
+                    }
+                    if (label) {
+                        searchInput.title = label;
+                    } else {
+                        searchInput.removeAttribute('title');
+                    }
+                };
+
+                searchInput.addEventListener('focus', () => {
+                    renderSuggestions(searchInput.value);
+                });
+
+                searchInput.addEventListener('input', () => {
+                    renderSuggestions(searchInput.value);
+                });
+
+                searchInput.addEventListener('keydown', (event) => {
+                    if (event.key === 'ArrowDown') {
+                        event.preventDefault();
+                        if (!suggestions.classList.contains('is-visible')) {
+                            renderSuggestions(searchInput.value);
+                        }
+                        if (suggestionButtons.length) {
+                            const nextIndex = highlightedIndex === -1 ? 0 : highlightedIndex + 1;
+                            highlightSuggestion(nextIndex);
+                        }
+                    } else if (event.key === 'ArrowUp') {
+                        event.preventDefault();
+                        if (!suggestions.classList.contains('is-visible')) {
+                            renderSuggestions(searchInput.value);
+                        }
+                        if (suggestionButtons.length) {
+                            const nextIndex = highlightedIndex === -1 ? suggestionButtons.length - 1 : highlightedIndex - 1;
+                            highlightSuggestion(nextIndex);
+                        }
+                    } else if (event.key === 'Enter') {
+                        if (highlightedIndex >= 0 && suggestionButtons[highlightedIndex]) {
+                            event.preventDefault();
+                            const optionIndex = Number(suggestionButtons[highlightedIndex].dataset.optionIndex);
+                            const option = select.options[optionIndex];
+                            selectOption(option);
+                            return;
+                        }
+
+                        const directMatch = Array.from(select.options).find((option) => {
+                            return formatOptionLabel(option).toLowerCase() === searchInput.value.trim().toLowerCase();
+                        });
+
+                        if (directMatch) {
+                            event.preventDefault();
+                            selectOption(directMatch);
+                        }
+                    } else if (event.key === 'Escape') {
+                        if (suggestions.classList.contains('is-visible')) {
+                            event.preventDefault();
+                            closeSuggestions();
+                        }
+                    }
+                });
+
+                searchInput.addEventListener('blur', () => {
+                    window.setTimeout(() => {
+                        closeSuggestions();
+                        const trimmed = searchInput.value.trim();
+                        if (!trimmed) {
+                            searchInput.value = '';
+                            select.value = '';
+                            select.dispatchEvent(new Event('change', { bubbles: true }));
+                        } else {
+                            syncInputWithSelection();
+                        }
+                    }, 120);
+                });
+
+                select.addEventListener('change', () => {
+                    syncInputWithSelection();
+                });
+
+                syncInputWithSelection();
+                row._closeCategorySuggestions = closeSuggestions;
+            }
+
             function enableProductSearch(row, select) {
                 if (!row || !select) {
                     return;
@@ -1477,6 +1776,7 @@
                 const subtotalCell = row.querySelector('.item-subtotal');
                 const searchInput = row.querySelector('.product-search-input');
                 const categorySelect = row.querySelector('.category-select');
+                const categorySearchInput = row.querySelector('.category-search-input');
 
                 const productOption = productSelect ? productSelect.options[productSelect.selectedIndex] : null;
                 const unitOption = unitSelect ? unitSelect.options[unitSelect.selectedIndex] : null;
@@ -1511,6 +1811,28 @@
                     if (searchInput && searchInput.value !== '') {
                         searchInput.value = '';
                     }
+                }
+
+                if (categorySelect) {
+                    const selectedCategoryOption = categorySelect.options[categorySelect.selectedIndex];
+                    const categoryValue = selectedCategoryOption ? selectedCategoryOption.value : '';
+                    const categoryLabel =
+                        selectedCategoryOption && categoryValue
+                            ? (selectedCategoryOption.textContent || '').trim()
+                            : '';
+                    if (categorySearchInput && categorySearchInput.value !== categoryLabel) {
+                        categorySearchInput.value = categoryLabel;
+                    }
+                    if (categorySearchInput) {
+                        if (categoryLabel) {
+                            categorySearchInput.title = categoryLabel;
+                        } else {
+                            categorySearchInput.removeAttribute('title');
+                        }
+                    }
+                } else if (categorySearchInput) {
+                    categorySearchInput.value = '';
+                    categorySearchInput.removeAttribute('title');
                 }
 
                 updateTotals();
@@ -1549,6 +1871,7 @@
                 enableSelectTypeahead(productSelect);
                 enableProductSearch(row, productSelect);
                 enableSelectTypeahead(categorySelect);
+                enableCategorySearch(row, categorySelect);
 
                 row.querySelector('.remove-item').addEventListener('click', () => {
                     if (itemsBody.querySelectorAll('.item-row').length === 1) {
@@ -1561,6 +1884,13 @@
                     if (row._productSuggestions) {
                         row._productSuggestions.remove();
                         row._productSuggestions = null;
+                    }
+                    if (typeof row._closeCategorySuggestions === 'function') {
+                        row._closeCategorySuggestions();
+                    }
+                    if (row._categorySuggestions) {
+                        row._categorySuggestions.remove();
+                        row._categorySuggestions = null;
                     }
                     row.remove();
                     updateTotals();
