@@ -122,7 +122,7 @@
                         @foreach ($movements as $movement)
                             <tr>
                                 <td>{{ \Illuminate\Support\Carbon::parse($movement->created_at)->format('d/m/Y H:i') }}</td>
-                                <td>{{ optional($movement->product)->name ?? '—' }}</td>
+                                <td>{{ optional($movement->product)->name ?? 'Produk tidak ditemukan' }}</td>
                                 <td>{{ ucfirst($movement->type) }}</td>
                                 <td>{{ $movement->quantity }}</td>
                                 <td>{{ $movement->notes }}</td>

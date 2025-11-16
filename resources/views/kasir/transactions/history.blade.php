@@ -164,9 +164,6 @@
                 </table>
             </div>
 
-            <div style="margin-top: 16px;">
-                {{ $transactions->links() }}
-            </div>
         @endif
     </div>
 @endsection

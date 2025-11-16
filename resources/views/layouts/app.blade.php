@@ -302,6 +302,79 @@
             box-shadow: 0 0 0 3px rgba(30, 60, 114, 0.1);
         }
 
+        nav[aria-label="Pagination Navigation"] {
+            margin-top: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            font-size: 14px;
+        }
+
+        nav[aria-label="Pagination Navigation"] > div {
+            width: 100%;
+        }
+
+        nav[aria-label="Pagination Navigation"] > :first-child {
+            display: none;
+        }
+
+        nav[aria-label="Pagination Navigation"] > :last-child {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        nav[aria-label="Pagination Navigation"] > :last-child > :last-child {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        nav[aria-label="Pagination Navigation"] .relative.inline-flex {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 12px;
+            border-radius: 10px;
+            border: 1px solid #d0d5dd;
+            background-color: #fff;
+            color: #475467;
+            text-decoration: none;
+            min-width: 42px;
+            font-weight: 600;
+        }
+
+        nav[aria-label="Pagination Navigation"] span[aria-current="page"] > span {
+            background-color: #b91c1c;
+            border-color: #b91c1c;
+            color: #fff;
+        }
+
+        nav[aria-label="Pagination Navigation"] svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        nav[aria-label="Pagination Navigation"] p {
+            margin: 0;
+            color: #475467;
+        }
+
+        @media (max-width: 640px) {
+            nav[aria-label="Pagination Navigation"] > :first-child {
+                display: flex;
+                justify-content: space-between;
+                gap: 12px;
+            }
+
+            nav[aria-label="Pagination Navigation"] > :last-child {
+                display: none;
+            }
+        }
+
         @media (max-width: 1200px) {
             :root {
                 --sidebar-width: 204px;

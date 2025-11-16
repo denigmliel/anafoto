@@ -410,7 +410,7 @@ class KasirController extends Controller
                 $query->where('code', 'like', '%' . $q . '%');
             })
             ->orderByDesc('transaction_date')
-            ->paginate(15)
+            ->paginate(20)
             ->withQueryString();
 
         return view('kasir.transactions.history', [
