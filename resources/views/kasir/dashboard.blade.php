@@ -2,7 +2,41 @@
 
 @section('title', 'Dashboard Kasir')
 
+@push('styles')
+    <style>
+        .scrollable-table {
+            max-height: 260px;
+            overflow-y: auto;
+            margin-top: 16px;
+        }
+
+        .scrollable-table thead th {
+            position: sticky;
+            top: 0;
+            background: #f8fafc;
+            z-index: 1;
+        }
+
+        .scrollable-table table {
+            margin: 0;
+        }
+
+        .time-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 12px;
+            border-radius: 12px;
+            background: #fef2f2;
+            color: #b91c1c;
+            font-weight: 700;
+            margin-bottom: 8px;
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.04);
+        }
+    </style>
+@endpush
+
 @section('content')
+    <div class="time-badge" id="kasir-clock"></div>
     <h1 class="page-title">Dashboard Kasir</h1>
 
     <div class="grid grid-3">
@@ -73,24 +107,26 @@
                 <div style="position: relative; height: 260px;">
                     <canvas id="monthly-sales-chart"></canvas>
                 </div>
-                <table class="data-table" style="margin-top: 16px;">
-                    <thead>
-                        <tr>
-                            <th>Tanggal</th>
-                            <th>Total</th>
-                            <th>Jumlah Transaksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($monthlySales as $summary)
+                <div class="scrollable-table">
+                    <table class="data-table">
+                        <thead>
                             <tr>
-                                <td>{{ \Illuminate\Support\Carbon::parse($summary->date)->format('d M Y') }}</td>
-                                <td>Rp{{ number_format($summary->total, 0, ',', '.') }}</td>
-                                <td>{{ $summary->transaction_count }}</td>
+                                <th>Tanggal</th>
+                                <th>Total</th>
+                                <th>Jumlah Transaksi</th>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @foreach ($monthlySales as $summary)
+                                <tr>
+                                    <td>{{ \Illuminate\Support\Carbon::parse($summary->date)->format('d M Y') }}</td>
+                                    <td>Rp{{ number_format($summary->total, 0, ',', '.') }}</td>
+                                    <td>{{ $summary->transaction_count }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
             @endif
         </div>
     </div>
@@ -132,6 +168,27 @@
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script>
             document.addEventListener('DOMContentLoaded', function () {
+                const kasirClock = document.getElementById('kasir-clock');
+                const formatWib = (date) => new Intl.DateTimeFormat('id-ID', {
+                    timeZone: 'Asia/Jakarta',
+                    weekday: 'long',
+                    day: '2-digit',
+                    month: 'long',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false,
+                }).format(date) + ' WIB';
+
+                if (kasirClock) {
+                    const tickClock = () => {
+                        kasirClock.textContent = formatWib(new Date());
+                    };
+                    tickClock();
+                    setInterval(tickClock, 1000);
+                }
+
                 const canvas = document.getElementById('monthly-sales-chart');
 
                 if (!canvas) {

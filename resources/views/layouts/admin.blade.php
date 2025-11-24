@@ -302,12 +302,6 @@
         @include('layouts.partials.sidebar')
 
         <div class="content">
-            <div class="top-bar">
-                <div class="user-info">
-                    {{ auth()->user()->name ?? 'Administrator' }}
-                </div>
-            </div>
-
             <div class="main-content">
                 @if (session('success'))
                     <div class="flash flash-success">
