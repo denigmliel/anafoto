@@ -4,19 +4,90 @@
 
 @push('styles')
     <style>
-        .form-inline {
+        .stock-hero {
+            background: linear-gradient(135deg, #f4f7ff 0%, #eef4ff 60%, #f8fbff 100%);
+            border-radius: 16px;
+            padding: 18px 20px;
             display: flex;
-            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
             gap: 12px;
-            align-items: flex-end;
+            box-shadow: 0 10px 26px rgba(59, 130, 246, 0.12);
+            border: 1px solid #e5e7eb;
             margin-bottom: 16px;
+            flex-wrap: wrap;
         }
 
-        .form-inline select {
+        .stock-hero .meta {
+            color: #475569;
+            margin: 4px 0 0;
+        }
+
+        .hero-chips {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-left: auto;
+        }
+
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 999px;
+            font-weight: 700;
+            font-size: 12px;
+            letter-spacing: 0.03em;
+        }
+
+        .chip--blue {
+            background: #e0f2fe;
+            color: #0f172a;
+        }
+
+        .chip--orange {
+            background: #fff7ed;
+            color: #9a3412;
+        }
+
+        .filters-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 14px;
+            box-shadow: 0 12px 26px rgba(15, 23, 42, 0.08);
+            border: 1px solid #e2e8f0;
+            margin-bottom: 14px;
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            align-items: end;
+        }
+
+        .filters-grid label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #475569;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .filters-grid select {
             padding: 10px 12px;
-            border-radius: 10px;
+            border-radius: 12px;
             border: 1px solid #d0d5dd;
-            min-width: 180px;
+            width: 100%;
+        }
+
+        .filters-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            justify-content: flex-start;
+            flex-wrap: wrap;
         }
 
         .stock-button {
@@ -26,7 +97,7 @@
             border: none;
             border-radius: 12px;
             padding: 12px 20px;
-            font-weight: 600;
+            font-weight: 700;
             font-size: 14px;
             letter-spacing: 0.2px;
             cursor: pointer;
@@ -35,7 +106,7 @@
         }
 
         .stock-button--blue {
-            background-color: #2563eb;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
             box-shadow: 0 10px 22px rgba(37, 99, 235, 0.22);
         }
 
@@ -50,36 +121,139 @@
             box-shadow: 0 8px 18px rgba(37, 99, 235, 0.2);
         }
 
-        .stock-button--green {
-            background-color: #16a34a;
-            box-shadow: 0 10px 22px rgba(22, 163, 74, 0.22);
+        .stock-button--ghost {
+            background: #e2e8f0;
+            color: #0f172a;
+            box-shadow: none;
         }
 
-        .stock-button--green:hover {
-            filter: brightness(1.05);
-            transform: translateY(-1px);
-            box-shadow: 0 14px 28px rgba(22, 163, 74, 0.28);
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin-bottom: 14px;
         }
 
-        .stock-button--green:active {
-            transform: translateY(0);
-            box-shadow: 0 8px 18px rgba(22, 163, 74, 0.2);
+        .stat-card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 14px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
         }
 
-        .form-inline .stock-button {
-            align-self: stretch;
+        .stat-title {
+            margin: 0;
+            font-size: 13px;
+            color: #475569;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 800;
+            margin-top: 6px;
+        }
+
+        .stat-muted {
+            font-size: 12px;
+            color: #64748b;
+            margin-top: 4px;
+        }
+
+        .table-modern {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table-modern th,
+        .table-modern td {
+            padding: 12px 14px;
+            border-bottom: 1px solid #e2e8f0;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        .table-modern th {
+            background: #f4f6fb;
+            color: #1f2937;
+            letter-spacing: 0.01em;
+            font-weight: 700;
+        }
+
+        .table-modern tr:last-child td {
+            border-bottom: none;
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-weight: 700;
+            font-size: 12px;
+            letter-spacing: 0.02em;
+        }
+
+        .pill--in {
+            background: #ecfdf3;
+            color: #166534;
+        }
+
+        .pill--out {
+            background: #fff1f2;
+            color: #b91c1c;
+        }
+
+        .pill--adjustment {
+            background: #fef9c3;
+            color: #854d0e;
+        }
+
+        .badge-user {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 8px;
+            border-radius: 8px;
+            background: #e0e7ff;
+            color: #312e81;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        @media (max-width: 900px) {
+            .filters-grid {
+                grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            }
         }
     </style>
 @endpush
 
 @section('content')
-    <h1 class="page-title">Pergerakan Stok</h1>
+    @php
+        $pageTotal = $movements->count();
+        $pageIn = $movements->where('type', 'in')->sum('quantity');
+        $pageOut = $movements->where('type', 'out')->sum('quantity');
+        $latestAt = optional($movements->first())->created_at;
+    @endphp
 
-    <div class="grid" style="grid-template-columns: 2fr 1fr; gap: 20px;">
-        <div class="card">
-            <form method="GET" action="{{ route('gudang.stock.movements') }}" class="form-inline">
+    <div class="stock-hero">
+        <div>
+            <h1 class="page-title" style="margin:0;">Pergerakan Stok</h1>
+            <p class="meta">Pantau pergerakan stok masuk/keluar dan catatan aktivitas terbaru.</p>
+        </div>
+        <div class="hero-chips">
+            <span class="chip chip--blue">Log tercatat: {{ number_format($movements->total()) }}</span>
+            <span class="chip chip--orange">Halaman ini: {{ number_format($pageTotal) }} baris</span>
+        </div>
+    </div>
+
+    <div class="filters-card">
+        <form method="GET" action="{{ route('gudang.stock.movements') }}">
+            <div class="filters-grid">
                 <div>
-                    <label for="type" class="muted" style="display:block; margin-bottom:4px;">Jenis</label>
+                    <label for="type">Jenis</label>
                     <select name="type" id="type">
                         <option value="">Semua</option>
                         <option value="in" @selected(request('type') === 'in')>Masuk</option>
@@ -87,9 +261,8 @@
                         <option value="adjustment" @selected(request('type') === 'adjustment')>Penyesuaian</option>
                     </select>
                 </div>
-
                 <div>
-                    <label for="product_id" class="muted" style="display:block; margin-bottom:4px;">Produk</label>
+                    <label for="product_id">Produk</label>
                     <select name="product_id" id="product_id">
                         <option value="">Semua</option>
                         @foreach ($products as $product)
@@ -99,23 +272,51 @@
                         @endforeach
                     </select>
                 </div>
-
-                <div>
+                <div class="filters-actions">
                     <button type="submit" class="stock-button stock-button--blue">Filter</button>
+                    <a href="{{ route('gudang.stock.movements') }}" class="stock-button stock-button--ghost" style="text-decoration:none;">Reset</a>
                 </div>
-            </form>
+            </div>
+        </form>
+    </div>
 
-            @if ($movements->isEmpty())
-                <p class="muted">Belum ada catatan pergerakan stok.</p>
-            @else
-                <table class="data-table">
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-title">Total log (filter saat ini)</div>
+            <div class="stat-value">{{ number_format($movements->total()) }}</div>
+            <div class="stat-muted">Ditampilkan {{ number_format($pageTotal) }} pada halaman ini</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-title">Total Masuk (halaman ini)</div>
+            <div class="stat-value">+{{ number_format($pageIn) }}</div>
+            <div class="stat-muted">Jumlah agregat untuk baris yang terlihat</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-title">Total Keluar (halaman ini)</div>
+            <div class="stat-value">-{{ number_format($pageOut) }}</div>
+            <div class="stat-muted">Jumlah agregat untuk baris yang terlihat</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-title">Aktivitas terbaru</div>
+            <div class="stat-value">{{ $latestAt ? \Illuminate\Support\Carbon::parse($latestAt)->diffForHumans() : '-' }}</div>
+            <div class="stat-muted">Waktu log paling baru</div>
+        </div>
+    </div>
+
+    <div class="card" style="padding: 0; overflow: hidden;">
+        @if ($movements->isEmpty())
+            <p class="muted" style="padding: 16px 18px;">Belum ada catatan pergerakan stok.</p>
+        @else
+            <div style="overflow-x: auto;">
+                <table class="table-modern">
                     <thead>
                         <tr>
-                            <th>Tanggal</th>
-                            <th>Produk</th>
-                            <th>Jenis</th>
-                            <th>Jumlah</th>
-                            <th>Catatan</th>
+                            <th style="min-width: 140px;">Tanggal</th>
+                            <th style="min-width: 220px;">Produk</th>
+                            <th style="min-width: 120px;">Jenis</th>
+                            <th style="min-width: 80px;">Jumlah</th>
+                            <th style="min-width: 120px;">User</th>
+                            <th style="min-width: 220px;">Catatan</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -123,92 +324,27 @@
                             <tr>
                                 <td>{{ \Illuminate\Support\Carbon::parse($movement->created_at)->format('d/m/Y H:i') }}</td>
                                 <td>{{ optional($movement->product)->name ?? 'Produk tidak ditemukan' }}</td>
-                                <td>{{ ucfirst($movement->type) }}</td>
+                                <td>
+                                    @php
+                                        $type = $movement->type;
+                                        $pillClass = $type === 'in' ? 'pill--in' : ($type === 'out' ? 'pill--out' : 'pill--adjustment');
+                                    @endphp
+                                    <span class="pill {{ $pillClass }}">{{ ucfirst($type) }}</span>
+                                </td>
                                 <td>{{ $movement->quantity }}</td>
+                                <td>
+                                    <span class="badge-user">{{ optional($movement->user)->name ?? 'Sistem' }}</span>
+                                </td>
                                 <td>{{ $movement->notes }}</td>
                             </tr>
                         @endforeach
                     </tbody>
                 </table>
+            </div>
 
-                <div style="margin-top: 16px;">
-                    {{ $movements->links() }}
-                </div>
-            @endif
-        </div>
-
-        <div class="card">
-            <h2 style="margin:0 0 12px; font-size:20px;">Penyesuaian Stok Manual</h2>
-            <form method="POST" action="{{ route('gudang.stock.adjustment') }}">
-                @csrf
-                <div style="display:flex; flex-direction:column; gap:12px;">
-                    <div>
-                        <label for="adjust_product_id" class="muted" style="display:block; margin-bottom:4px;">Produk</label>
-                        <select
-                            id="adjust_product_id"
-                            name="product_id"
-                            style="padding:10px 12px; border-radius:10px; border:1px solid #d0d5dd; width:100%;"
-                            required
-                        >
-                            <option value="">Pilih produk</option>
-                            @foreach ($products as $product)
-                                @php($stockText = $product->is_stock_unlimited ? '-' : $product->stock)
-                                <option value="{{ $product->id }}" @if($product->is_stock_unlimited) disabled @endif>
-                                    {{ $product->name }} (Stok: {{ $stockText }}{{ $product->is_stock_unlimited ? ' - tidak dapat disesuaikan' : '' }})
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('product_id')
-                            <div class="input-error">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div>
-                        <label class="muted" style="display:block; margin-bottom:4px;">Jenis Penyesuaian</label>
-                        <select
-                            name="direction"
-                            style="padding:10px 12px; border-radius:10px; border:1px solid #d0d5dd; width:100%;"
-                            required
-                        >
-                            <option value="increase">Tambah Stok</option>
-                            <option value="decrease">Kurangi Stok</option>
-                        </select>
-                        @error('direction')
-                            <div class="input-error">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div>
-                        <label class="muted" style="display:block; margin-bottom:4px;">Jumlah</label>
-                        <input
-                            type="number"
-                            name="quantity"
-                            min="1"
-                            class="form-control"
-                            required
-                        >
-                        @error('quantity')
-                            <div class="input-error">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div>
-                        <label class="muted" style="display:block; margin-bottom:4px;">Catatan</label>
-                        <textarea
-                            name="notes"
-                            class="form-textarea"
-                            placeholder="Contoh: stok opname, barang rusak, dll"
-                        >{{ old('notes') }}</textarea>
-                        @error('notes')
-                            <div class="input-error">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                <div>
-                    <button type="submit" class="stock-button stock-button--green">Simpan Penyesuaian</button>
-                </div>
-                </div>
-            </form>
-        </div>
+            <div style="padding: 16px 18px;">
+                {{ $movements->links() }}
+            </div>
+        @endif
     </div>
 @endsection

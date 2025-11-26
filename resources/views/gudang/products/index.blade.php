@@ -12,8 +12,22 @@
             background-color: #ffffff;
         }
 
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 0 14px;
+            margin: 0 0 16px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
         .product-console__form {
-            margin-bottom: 18px;
+            margin-bottom: 16px;
+            padding: 14px 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            background: #f8fafc;
+            box-shadow: inset 0 -1px 0 rgba(15, 23, 42, 0.04);
         }
 
         .product-console__row {
@@ -135,6 +149,10 @@
             display: flex;
             gap: 12px;
             align-items: center;
+        }
+
+        .product-console__table {
+            padding-top: 12px;
         }
 
         .button {
@@ -276,7 +294,9 @@
 @endpush
 
 @section('content')
-    <h1 class="page-title">Manajemen Produk</h1>
+    <div class="page-header">
+        <h1 class="page-title" style="margin: 0;">Manajemen Produk</h1>
+    </div>
 
     <div class="card product-console">
         <form method="GET" action="{{ route('gudang.products.index') }}" class="product-console__form">

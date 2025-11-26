@@ -480,8 +480,6 @@
             <p class="muted" style="margin-bottom: 20px;">
                 @if ($editingTransaction)
                     Anda sedang mengubah transaksi <strong>{{ $editingTransaction['code'] ?? '' }}</strong>. Sesuaikan item atau pembayaran lalu simpan untuk memperbarui data.
-                @else
-                    Pilih produk dan tentukan jumlah. Sistem akan otomatis menghitung subtotal dan kembalian.
                 @endif
             </p>
 
@@ -538,44 +536,9 @@
                     } elseif (is_string($oldPaymentAmount)) {
                         $oldPaymentNumeric = preg_replace('/[^\d]/', '', $oldPaymentAmount);
                     } else {
-                        $oldPaymentNumeric = '';
-                    }
-                @endphp
-
-                <div class="form-grid" style="margin-bottom: 20px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));">
-                    <div style="max-width: 320px;">
-                        <label class="form-label" for="payment_method">Metode Pembayaran</label>
-                        <select name="payment_method" id="payment_method" class="form-select">
-                            @foreach ($paymentMethods as $value => $label)
-                                <option value="{{ $value }}" @selected(old('payment_method', $defaultPaymentMethod) === $value)>
-                                    {{ $label }}
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('payment_method')
-                            <div class="input-error">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div style="max-width: 340px;">
-                        <label class="form-label" for="payment_amount_display">Nominal Pembayaran</label>
-                        <div class="currency-input">
-                            <span class="currency-prefix">Rp</span>
-                            <input
-                                type="text"
-                                inputmode="numeric"
-                                id="payment_amount_display"
-                                placeholder="0"
-                                autocomplete="off"
-                                value="{{ $oldPaymentNumeric !== '' ? number_format((int) $oldPaymentNumeric, 0, ',', '.') : '' }}"
-                            >
-                        </div>
-                        <input type="hidden" name="payment_amount" id="payment_amount" value="{{ $oldPaymentNumeric }}">
-                        @error('payment_amount')
-                            <div class="input-error">{{ $message }}</div>
-                        @enderror
-                    </div>
-                </div>
+                    $oldPaymentNumeric = '';
+                }
+            @endphp
 
                 @php
                     $defaultItems = [
@@ -812,6 +775,43 @@
                     </div>
                 </div>
 
+                <div style="margin-top: 24px; display: flex; justify-content: center;">
+                    <div class="form-grid" style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); width: min(820px, 100%);">
+                        <div style="max-width: 320px;">
+                            <label class="form-label" for="payment_method">Metode Pembayaran</label>
+                            <select name="payment_method" id="payment_method" class="form-select">
+                                @foreach ($paymentMethods as $value => $label)
+                                    <option value="{{ $value }}" @selected(old('payment_method', $defaultPaymentMethod) === $value)>
+                                        {{ $label }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('payment_method')
+                                <div class="input-error">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div style="max-width: 340px;">
+                            <label class="form-label" for="payment_amount_display">Nominal Pembayaran</label>
+                            <div class="currency-input">
+                                <span class="currency-prefix">Rp</span>
+                                <input
+                                    type="text"
+                                    inputmode="numeric"
+                                    id="payment_amount_display"
+                                    placeholder="0"
+                                    autocomplete="off"
+                                    value="{{ $oldPaymentNumeric !== '' ? number_format((int) $oldPaymentNumeric, 0, ',', '.') : '' }}"
+                                >
+                            </div>
+                            <input type="hidden" name="payment_amount" id="payment_amount" value="{{ $oldPaymentNumeric }}">
+                            @error('payment_amount')
+                                <div class="input-error">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+
                 <div style="margin-top: 24px; display: flex; justify-content: flex-end; gap: 12px;">
                     <button type="reset" class="btn btn-secondary">Reset</button>
                     <button type="submit" class="btn btn-primary">Simpan &amp; Proses</button>
@@ -899,16 +899,16 @@
                     <option value="">Pilih produk terlebih dahulu</option>
                 </select>
             </div>
-            <div class="item-cell item-cell--quantity">
-                <div class="item-cell-label">Jumlah</div>
-                <input
-                    type="number"
-                    min="0"
-                    value="0"
-                    data-name="items[INDEX][quantity]"
-                    class="form-control quantity-input"
-                >
-            </div>
+                <div class="item-cell item-cell--quantity">
+                    <div class="item-cell-label">Jumlah</div>
+                    <input
+                        type="number"
+                        min="0"
+                        value="1"
+                        data-name="items[INDEX][quantity]"
+                        class="form-control quantity-input"
+                    >
+                </div>
             <div class="item-cell item-cell--subtotal">
                 <div class="item-cell-label">Subtotal</div>
                 <div class="item-subtotal" data-value="0">Rp0</div>

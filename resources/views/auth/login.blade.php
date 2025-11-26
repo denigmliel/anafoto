@@ -12,7 +12,7 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #c9302c 100%);
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 40%, #9b2e5a 75%, #c9302c 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -23,9 +23,9 @@
         .login-container {
             background: white;
             border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
             overflow: hidden;
-            max-width: 480px;
+            max-width: 400px;
             width: 100%;
             display: flex;
             flex-direction: column;
@@ -45,7 +45,7 @@
 
         .login-left {
             background: linear-gradient(135deg, #c9302c 0%, #e74c3c 100%);
-            padding: 48px 40px 36px;
+            padding: 32px 28px 26px;
             flex: none;
             color: white;
             display: flex;
@@ -64,7 +64,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 30px;
+            margin-bottom: 22px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             overflow: hidden;
             border: 4px solid white;
@@ -84,18 +84,18 @@
         }
 
         .login-right {
-            padding: 36px 40px 44px;
+            padding: 26px 26px 32px;
             flex: none;
             background: white;
         }
 
         .login-header {
-            margin-bottom: 40px;
+            margin-bottom: 24px;
         }
 
         .login-header h2 {
             color: #1e3c72;
-            font-size: 28px;
+            font-size: 26px;
             margin-bottom: 10px;
         }
 
@@ -105,7 +105,45 @@
         }
 
         .form-group {
-            margin-bottom: 25px;
+            margin-bottom: 18px;
+        }
+
+        .password-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: #475467;
+            padding: 6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+
+        .toggle-password:focus {
+            outline: 2px solid rgba(30, 60, 114, 0.25);
+            outline-offset: 3px;
+        }
+
+        .toggle-password:hover {
+            background: rgba(30, 60, 114, 0.08);
+        }
+
+        .toggle-password svg {
+            width: 20px;
+            height: 20px;
+            pointer-events: none;
         }
 
         .form-group label {
@@ -148,7 +186,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             font-size: 14px;
         }
 
@@ -190,7 +228,7 @@
 
         .btn-login:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(201, 48, 44, 0.4);
+            box-shadow: 0 8px 22px rgba(201, 48, 44, 0.35);
         }
 
         .btn-login:active {
@@ -200,7 +238,7 @@
         .alert {
             padding: 12px 16px;
             border-radius: 8px;
-            margin-bottom: 20px;
+            margin-bottom: 14px;
             font-size: 14px;
             animation: slideDown 0.3s ease-out;
         }
@@ -234,11 +272,11 @@
             }
 
             .login-left {
-                padding: 36px 24px 28px;
+                padding: 28px 22px 22px;
             }
 
             .login-right {
-                padding: 28px 24px 36px;
+                padding: 24px 20px 28px;
             }
 
         }
@@ -287,7 +325,7 @@
                         class="@error('email') is-invalid @enderror"
                         required
                         autofocus
-                        placeholder="user@anafotocopy.com"
+                        placeholder=""
                     >
                     @error('email')
                         <span class="invalid-feedback">{{ $message }}</span>
@@ -296,14 +334,22 @@
 
                 <div class="form-group">
                     <label for="password">Password</label>
-                    <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        class="@error('password') is-invalid @enderror"
-                        required
-                        placeholder="••••••••"
-                    >
+                    <div class="password-wrapper">
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            class="@error('password') is-invalid @enderror"
+                            required
+                            placeholder="********"
+                        >
+                        <button type="button" class="toggle-password" id="toggle-password" aria-label="Tampilkan password">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7Z" />
+                                <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5" />
+                            </svg>
+                        </button>
+                    </div>
                     @error('password')
                         <span class="invalid-feedback">{{ $message }}</span>
                     @enderror
@@ -325,25 +371,58 @@
                 <button type="submit" class="btn-login">LOGIN</button>
             </form>
 
-            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0; font-size: 12px; color: #999; text-align: center;">
-                <p><strong>Akun Default:</strong></p>
-                <p>Admin: admin@anafotocopy.com | password</p>
-            </div>
         </div>
     </div>
 @endsection
 
 @push('scripts')
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', () => {
             const alerts = document.querySelectorAll('.alert');
             alerts.forEach(alert => {
                 setTimeout(() => {
-                    alert.style.opacity = '0';
                     alert.style.transition = 'opacity 0.5s';
-                    setTimeout(() => alert.remove(), 500);
-                }, 5000);
+                    alert.style.opacity = '0';
+                    setTimeout(() => alert.remove(), 600);
+                }, 3500);
             });
+
+            const togglePassword = document.getElementById('toggle-password');
+            const passwordInput = document.getElementById('password');
+
+            if (togglePassword && passwordInput) {
+                const eyeOpen = `
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7Z" />
+                        <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5" />
+                    </svg>
+                `;
+
+                const eyeClosed = `
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 3l18 18M9.88 9.88A3 3 0 0112 9c1.657 0 3 1.343 3 3a3 3 0 01-.88 2.12M9.88 9.88 4.12 4.12M9.88 9.88 5.5 14.3M14.12 14.12 18.5 9.7M3.98 8.223C5.845 6.09 8.701 5 12 5c2.026 0 3.913.48 5.46 1.313M20.02 15.777C18.155 17.91 15.299 19 12 19c-2.026 0-3.913-.48-5.46-1.313" />
+                    </svg>
+                `;
+
+                const updateToggle = () => {
+                    const isHidden = passwordInput.type === 'password';
+                    togglePassword.innerHTML = isHidden ? eyeOpen : eyeClosed;
+                    togglePassword.setAttribute('aria-label', isHidden ? 'Tampilkan password' : 'Sembunyikan password');
+                };
+
+                togglePassword.addEventListener('click', () => {
+                    passwordInput.type = passwordInput.type === 'password' ? 'text' : 'password';
+                    updateToggle();
+                    passwordInput.focus();
+                    passwordInput.setSelectionRange(passwordInput.value.length, passwordInput.value.length);
+                });
+
+                updateToggle();
+            }
         });
     </script>
 @endpush
+
+
+
+

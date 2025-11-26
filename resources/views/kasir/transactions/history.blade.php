@@ -62,20 +62,6 @@
             overflow: hidden;
         }
 
-        .history-table-wrapper--scrollable {
-            max-height: 460px; /* approx. 10 rows */
-            overflow-y: auto;
-            border: none;
-        }
-
-        .history-table-wrapper--scrollable::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .history-table-wrapper--scrollable::-webkit-scrollbar-thumb {
-            background-color: rgba(148, 163, 184, 0.6);
-            border-radius: 999px;
-        }
     </style>
 @endpush
 
@@ -118,8 +104,7 @@
         @if ($transactions->isEmpty())
             <p class="muted">Belum ada transaksi sesuai filter yang dipilih.</p>
         @else
-            @php($scrollable = $transactions->count() > 10)
-            <div class="history-table-wrapper {{ $scrollable ? 'history-table-wrapper--scrollable' : '' }}">
+            <div class="history-table-wrapper">
                 <table class="data-table" style="margin-bottom: 0;">
                     <thead>
                         <tr>

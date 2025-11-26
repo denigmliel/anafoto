@@ -631,9 +631,6 @@
                             pattern="^(-|\d+)$"
                             title="Masukkan angka atau tanda '-' untuk stok tidak terbatas"
                         >
-                        <small style="display: block; margin-top: 6px; color: #475467;">
-                            Masukkan angka untuk stok pasti atau '-' jika stok tidak dapat dihitung.
-                        </small>
                         @error('stock')
                             <div class="input-error">{{ $message }}</div>
                         @enderror

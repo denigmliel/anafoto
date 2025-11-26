@@ -24,13 +24,13 @@
 
         body {
             margin: 0;
-            overflow-x: auto;
+            overflow-x: hidden;
         }
 
         .layout {
             min-height: 100vh;
-            display: grid;
-            grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+            display: flex;
+            width: 100vw;
         }
 
         .sidebar {
@@ -40,8 +40,9 @@
             display: flex;
             flex-direction: column;
             gap: 32px;
-            position: sticky;
+            position: fixed;
             top: 0;
+            left: 0;
             height: 100vh;
             overflow-y: auto;
             width: var(--sidebar-width);
@@ -89,6 +90,25 @@
             border-radius: 14px;
             background-color: rgba(255, 255, 255, 0.08);
             overflow: hidden;
+        }
+
+        .sidebar-section-single {
+            padding: 0;
+        }
+
+        .sidebar-single-link {
+            display: block;
+            padding: 12px 16px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        .sidebar-single-link.active,
+        .sidebar-single-link:hover {
+            background-color: rgba(255, 255, 255, 0.24);
+            color: #fff;
         }
 
         .sidebar-summary {
@@ -148,7 +168,11 @@
             padding: 24px clamp(18px, 3vw, 32px);
             display: flex;
             flex-direction: column;
-            width: 100%;
+            width: calc(100vw - var(--sidebar-width));
+            max-width: calc(100vw - var(--sidebar-width));
+            margin-left: var(--sidebar-width);
+            box-sizing: border-box;
+            min-width: 0;
         }
 
         .top-bar {
@@ -280,6 +304,9 @@
 
             .content {
                 padding: 20px 16px;
+                width: calc(100vw - var(--sidebar-width));
+                max-width: calc(100vw - var(--sidebar-width));
+                margin-left: var(--sidebar-width);
             }
 
             .main-content {

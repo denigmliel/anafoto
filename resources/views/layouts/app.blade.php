@@ -87,6 +87,25 @@
             overflow: hidden;
         }
 
+        .sidebar-section-single {
+            padding: 0;
+        }
+
+        .sidebar-single-link {
+            display: block;
+            padding: 12px 16px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.92);
+            text-decoration: none;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        .sidebar-single-link.active,
+        .sidebar-single-link:hover {
+            background-color: rgba(255, 255, 255, 0.18);
+            color: #fff;
+        }
+
         .sidebar-summary {
             display: flex;
             align-items: center;

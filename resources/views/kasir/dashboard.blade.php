@@ -4,6 +4,98 @@
 
 @push('styles')
     <style>
+        .dashboard-hero {
+            background: linear-gradient(135deg, #f3f6ff 0%, #eef4ff 60%, #f8fbff 100%);
+            border-radius: 16px;
+            padding: 18px 20px;
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+            box-shadow: 0 12px 28px rgba(59, 130, 246, 0.14);
+            border: 1px solid #e2e8f0;
+            margin-bottom: 16px;
+        }
+
+        .dashboard-hero .eyebrow {
+            font-size: 12px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #475569;
+            margin: 0 0 6px;
+            font-weight: 700;
+        }
+
+        .dashboard-hero h1 {
+            margin: 0;
+        }
+
+        .dashboard-hero p {
+            margin: 6px 0 0;
+            color: #475569;
+        }
+
+        .hero-chips {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 999px;
+            font-weight: 700;
+            font-size: 12px;
+            letter-spacing: 0.02em;
+            background: #e0f2fe;
+            color: #0f172a;
+        }
+
+        .chip--red {
+            background: #fef2f2;
+            color: #b91c1c;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+
+        .stat-card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 14px 16px;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .stat-title {
+            margin: 0;
+            font-size: 13px;
+            color: #475569;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 800;
+            line-height: 1.1;
+        }
+
+        .stat-muted {
+            font-size: 12px;
+            color: #64748b;
+        }
+
         .scrollable-table {
             max-height: 260px;
             overflow-y: auto;
@@ -20,57 +112,45 @@
         .scrollable-table table {
             margin: 0;
         }
-
-        .time-badge {
-            display: inline-flex;
-            align-items: center;
-            padding: 8px 12px;
-            border-radius: 12px;
-            background: #fef2f2;
-            color: #b91c1c;
-            font-weight: 700;
-            margin-bottom: 8px;
-            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.04);
-        }
     </style>
 @endpush
 
 @section('content')
-    <div class="time-badge" id="kasir-clock"></div>
-    <h1 class="page-title">Dashboard Kasir</h1>
-
-    <div class="grid grid-3">
-        <div class="card">
-            <div class="muted">Penjualan Hari Ini</div>
-            <div class="muted" style="margin-top: 4px; font-size: 13px;">
-                {{ $todayDateLabel }}
-            </div>
-            <div style="font-size: 28px; font-weight: 700; margin-top: 8px;">
-                Rp{{ number_format($todaySalesTotal, 0, ',', '.') }}
-            </div>
-            <div class="muted" style="margin-top: 6px;">
-                Total transaksi: {{ $todayTransactionCount }}
-            </div>
+    <div class="dashboard-hero">
+        <div>
+            <div class="eyebrow">Kasir</div>
+            <h1 class="page-title" style="margin: 0;">Dashboard Kasir</h1>
+            <p>Ringkasan penjualan hari ini, tren bulanan, dan transaksi terbaru.</p>
         </div>
-
-        <div class="card">
-            <div class="muted">Produk Terjual Hari Ini</div>
-            <div style="font-size: 28px; font-weight: 700; margin-top: 8px;">
-                {{ $todayItemsSold }}
-            </div>
-            <div class="muted" style="margin-top: 6px;">Item</div>
+        <div class="hero-chips">
+            <span class="chip chip--red" id="kasir-clock"></span>
         </div>
+    </div>
 
-        <div class="card">
-            <div class="muted">Rata-rata Nilai Transaksi</div>
-            <div style="font-size: 28px; font-weight: 700; margin-top: 8px;">
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-title">Penjualan Hari Ini</div>
+            <div class="stat-muted">{{ $todayDateLabel }}</div>
+            <div class="stat-value">Rp{{ number_format($todaySalesTotal, 0, ',', '.') }}</div>
+            <div class="stat-muted">Total transaksi: {{ $todayTransactionCount }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-title">Produk Terjual</div>
+            <div class="stat-muted">Hari ini</div>
+            <div class="stat-value">{{ $todayItemsSold }}</div>
+            <div class="stat-muted">Item</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-title">Rata-rata Nilai Transaksi</div>
+            <div class="stat-muted">Hari ini</div>
+            <div class="stat-value">
                 @if ($todayTransactionCount > 0)
                     Rp{{ number_format($todaySalesTotal / $todayTransactionCount, 0, ',', '.') }}
                 @else
                     Rp0
                 @endif
             </div>
-            <div class="muted" style="margin-top: 6px;">Per transaksi</div>
+            <div class="stat-muted">Per transaksi</div>
         </div>
     </div>
 

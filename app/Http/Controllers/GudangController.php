@@ -20,18 +20,33 @@ class GudangController extends Controller
 
     public function dashboard()
     {
+        $startOfDay = now()->startOfDay();
+
         $stats = [
             'productCount' => Product::count(),
             'activeProductCount' => Product::where('is_active', true)->count(),
+            'inactiveProductCount' => Product::where('is_active', false)->count(),
             'lowStockCount' => Product::where('is_stock_unlimited', false)
                 ->where('stock', '<=', self::LOW_STOCK_THRESHOLD)
                 ->count(),
+            'categoryCount' => Category::count(),
+            'movementToday' => StockMovement::where('created_at', '>=', $startOfDay)->count(),
+            'stockInToday' => StockMovement::where('type', 'in')
+                ->where('created_at', '>=', $startOfDay)
+                ->sum('quantity'),
+            'stockOutToday' => StockMovement::where('type', 'out')
+                ->where('created_at', '>=', $startOfDay)
+                ->sum('quantity'),
         ];
 
         $recentMovements = StockMovement::with(['product', 'user'])
             ->latest('created_at')
             ->limit(8)
             ->get();
+
+        $recentlyUpdatedProducts = Product::orderByDesc('updated_at')
+            ->limit(5)
+            ->get(['id', 'name', 'stock', 'unit', 'is_stock_unlimited', 'updated_at']);
 
         $topLowStocks = Product::where('is_stock_unlimited', false)
             ->where('stock', '<=', self::LOW_STOCK_THRESHOLD)
@@ -42,6 +57,7 @@ class GudangController extends Controller
         return view('gudang.dashboard', [
             'stats' => $stats,
             'recentMovements' => $recentMovements,
+            'recentlyUpdatedProducts' => $recentlyUpdatedProducts,
             'topLowStocks' => $topLowStocks,
             'lowStockThreshold' => self::LOW_STOCK_THRESHOLD,
         ]);
@@ -561,14 +577,33 @@ class GudangController extends Controller
             $query->where('is_active', $request->input('status') === 'active');
         }
 
-        $products = $query->get();
+        $productsForTotals = (clone $query)->get();
+        $products = $query->paginate(25)->withQueryString();
         $categories = Category::orderBy('name')->get();
 
-        $limitedProducts = $products->filter(fn ($product) => ! $product->is_stock_unlimited);
+        $limitedProducts = $productsForTotals->filter(fn ($product) => ! $product->is_stock_unlimited);
         $totalValue = $limitedProducts->sum(fn ($product) => $product->stock * $product->price);
         $totalStock = $limitedProducts->sum('stock');
 
-        return view('gudang.reports.stock', compact('products', 'categories', 'totalValue', 'totalStock'));
+        $pageProducts = $products->getCollection();
+        $pageLimited = $pageProducts->filter(fn ($product) => ! $product->is_stock_unlimited);
+        $pageItems = $pageProducts->count();
+        $pageStock = $pageLimited->sum('stock');
+        $pageValue = $pageLimited->sum(fn ($product) => $product->stock * $product->price);
+        $pageActive = $pageProducts->where('is_active', true)->count();
+        $pageInactive = $pageProducts->where('is_active', false)->count();
+
+        return view('gudang.reports.stock', compact(
+            'products',
+            'categories',
+            'totalValue',
+            'totalStock',
+            'pageItems',
+            'pageStock',
+            'pageValue',
+            'pageActive',
+            'pageInactive'
+        ));
     }
 
     protected function generateProductCode(): string
