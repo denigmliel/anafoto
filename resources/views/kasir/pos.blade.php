@@ -466,6 +466,170 @@
             flex: 1;
             font-size: 14px;
         }
+
+        .items-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .items-toolbar__actions {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .smart-scan {
+            display: none;
+            margin-bottom: 12px;
+            border: 1px dashed #c7d2fe;
+            background: linear-gradient(135deg, #eef2ff 0%, #e0f2fe 100%);
+            border-radius: 16px;
+            padding: 14px 16px;
+            gap: 12px;
+        }
+
+        .smart-scan.is-visible {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr);
+        }
+
+        .smart-scan__header {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .smart-scan__title {
+            margin: 0;
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .smart-scan__desc {
+            margin: 4px 0 0;
+            color: #475467;
+            font-size: 13px;
+        }
+
+        .smart-scan__actions {
+            display: inline-flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .smart-scan__body {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr);
+            gap: 12px;
+            margin-top: 10px;
+            justify-items: center;
+            align-items: center;
+        }
+
+        .smart-scan__video {
+            position: relative;
+            width: 100%;
+            min-height: 220px;
+            border-radius: 14px;
+            overflow: hidden;
+            background: #0f172a;
+            border: 1px solid #cbd5e1;
+            max-width: 720px;
+            margin: 0 auto;
+        }
+
+        .smart-scan__video video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .smart-scan__video video.smart-scan__video--unmirror {
+            transform: scaleX(-1);
+        }
+
+        .smart-scan__status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            background: #e0f2fe;
+            color: #0b4f6c;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .smart-scan__status[data-variant="error"] {
+            background: #fef2f2;
+            color: #b42318;
+            border: 1px solid #fecdd3;
+        }
+
+        .smart-scan__status[data-variant="success"] {
+            background: #ecfdf3;
+            color: #027a48;
+            border: 1px solid #bbf7d0;
+        }
+
+        .smart-scan__hint {
+            font-size: 12px;
+            color: #475467;
+            margin: 4px 0 0;
+        }
+
+        .smart-scan__badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px 10px;
+            background: #1d4ed8;
+            color: #fff;
+            border-radius: 999px;
+            font-size: 12px;
+            letter-spacing: 0.3px;
+            font-weight: 700;
+        }
+
+        .smart-scan__pulse {
+            position: absolute;
+            inset: 0;
+            border: 2px solid rgba(59, 130, 246, 0.5);
+            border-radius: 14px;
+            pointer-events: none;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.7; }
+            50% { opacity: 0.15; }
+            100% { opacity: 0.7; }
+        }
+
+        .smart-scan__status-icon {
+            width: 18px;
+            height: 18px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .smart-scan__status-icon svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+        }
+
+        @media (min-width: 900px) {
+            .smart-scan.is-visible {
+                grid-template-columns: minmax(0, 1fr);
+            }
+        }
     </style>
 @endpush
 
@@ -548,9 +712,56 @@
                 @endphp
 
                 <div class="card" style="padding: 32px; border: 1px dashed #d0d5dd; background-color: #f9fbff;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <div class="items-toolbar">
                         <h3 style="margin: 0; font-size: 18px;">Daftar Item</h3>
-                        <button type="button" class="btn btn-secondary" id="add-item-btn">Tambah Item</button>
+                        <div class="items-toolbar__actions">
+                            <button
+                                type="button"
+                                class="btn btn-secondary btn-icon"
+                                id="smart-scan-toggle"
+                                title="Scan QR produk dengan kamera"
+                                aria-label="Scan QR produk dengan kamera"
+                            >
+                                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                    <path d="M7 5a2 2 0 0 0-2 2v2H3V7a4 4 0 0 1 4-4h2v2H7Zm8-2h2a4 4 0 0 1 4 4v2h-2V7a2 2 0 0 0-2-2h-2V3Zm-8 16h2v2H7a4 4 0 0 1-4-4v-2h2v2a2 2 0 0 0 2 2Zm12-2a2 2 0 0 1-2 2h-2v2h2a4 4 0 0 0 4-4v-2h-2v2ZM8 9.5A1.5 1.5 0 1 1 9.5 11 1.5 1.5 0 0 1 8 9.5ZM12 12a4 4 0 1 1 4-4 4 4 0 0 1-4 4Zm0-2a2 2 0 1 0-2-2 2 2 0 0 0 2 2Zm-3 4h6v2H9Zm8 0h2v2h-2Zm-10 0h2v2H7Z"/>
+                                </svg>
+                            </button>
+                            <button type="button" class="btn btn-secondary" id="add-item-btn">Tambah Item</button>
+                        </div>
+                    </div>
+
+                    <div id="smart-scan-panel" class="smart-scan" aria-live="polite" hidden>
+                        <div class="smart-scan__header">
+                            <div>
+                                <div class="smart-scan__badge">Smart Scan</div>
+                                <p class="smart-scan__desc">Gunakan kamera HP/Laptop untuk membaca QR produk dan otomatis menambah ke keranjang.</p>
+                            </div>
+                            <div class="smart-scan__actions">
+                                <button type="button" class="btn btn-secondary btn-icon" id="smart-scan-close" title="Tutup pemindaian" aria-label="Tutup pemindaian">
+                                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                        <path d="M18.3 5.7a1 1 0 0 0-1.4-1.4L12 9.59 7.1 4.7A1 1 0 1 0 5.7 6.1L10.6 11 5.7 15.9a1 1 0 1 0 1.4 1.4L12 12.41l4.9 4.89a1 1 0 1 0 1.4-1.4L13.41 11z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="smart-scan__body">
+                            <div class="smart-scan__video">
+                                <video id="smart-scan-video" autoplay playsinline muted></video>
+                                <div class="smart-scan__pulse" aria-hidden="true"></div>
+                                <canvas id="smart-scan-canvas" hidden></canvas>
+                            </div>
+                            <div>
+                                <div id="smart-scan-status" class="smart-scan__status" data-variant="info">
+                                    <span class="smart-scan__status-icon" aria-hidden="true">
+                                        <svg viewBox="0 0 24 24" focusable="false">
+                                            <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Zm0 15a1 1 0 1 1 1-1 1 1 0 0 1-1 1Zm1-4a1 1 0 0 1-2 0V7a1 1 0 0 1 2 0Z"/>
+                                        </svg>
+                                    </span>
+                                    <span>Tekan ikon kamera untuk memulai pemindaian.</span>
+                                </div>
+                                <p class="smart-scan__hint" id="smart-scan-hint">Tips: gunakan kamera belakang di HP untuk fokus lebih cepat dan jaga jarak 10-20 cm dari label.</p>
+                            </div>
+                        </div>
                     </div>
 
                     <div id="low-stock-alert" class="low-stock-alert" role="status" aria-live="polite">
@@ -938,6 +1149,14 @@
             const posForm = document.getElementById('pos-form');
             const lowStockAlert = document.getElementById('low-stock-alert');
             const lowStockList = document.getElementById('low-stock-alert-list');
+            const smartScanToggle = document.getElementById('smart-scan-toggle');
+            const smartScanPanel = document.getElementById('smart-scan-panel');
+            const smartScanVideo = document.getElementById('smart-scan-video');
+            const smartScanStatus = document.getElementById('smart-scan-status');
+            const smartScanHint = document.getElementById('smart-scan-hint');
+            const smartScanCanvas = document.getElementById('smart-scan-canvas');
+            const smartScanClose = document.getElementById('smart-scan-close');
+            const smartScanStatusText = smartScanStatus ? smartScanStatus.querySelector('span:last-child') : null;
             const LOW_STOCK_THRESHOLD = 3;
             const POS_DRAFT_STORAGE_KEY = 'pos_form_draft_v1';
             const hasOldInput = posForm ? posForm.dataset.hasOldInput === '1' : false;
@@ -956,6 +1175,13 @@
                 }
             })();
             let isRestoringDraft = false;
+            let smartScanStream = null;
+            let smartScanActive = false;
+            let smartScanFrameHandle = null;
+            let barcodeDetector = null;
+            let jsqrLoader = null;
+            let lastScanValue = '';
+            let lastScanAt = 0;
 
             let rowIndex = itemsBody.querySelectorAll('.item-row').length;
 
@@ -1059,6 +1285,417 @@
                     window.localStorage.removeItem(POS_DRAFT_STORAGE_KEY);
                 } catch (error) {
                     console.warn('Gagal menghapus draft POS', error);
+                }
+            }
+
+            function parseUnitsFromOption(option) {
+                if (!option || !option.dataset.units) {
+                    return [];
+                }
+
+                try {
+                    const parsed = JSON.parse(option.dataset.units);
+                    return Array.isArray(parsed) ? parsed : [];
+                } catch (error) {
+                    console.warn('Gagal membaca data satuan produk', error);
+                    return [];
+                }
+            }
+
+            function buildProductIndex() {
+                const referenceSelect = document.querySelector('.product-select');
+                const byId = new Map();
+                const byCode = new Map();
+
+                if (!referenceSelect) {
+                    return { byId, byCode };
+                }
+
+                Array.from(referenceSelect.options)
+                    .filter((option) => option.value)
+                    .forEach((option) => {
+                        const units = parseUnitsFromOption(option);
+                        const defaultUnitId = units.length ? String(units[0].id) : '';
+                        const payload = {
+                            id: String(option.value),
+                            code: option.dataset.productCode || '',
+                            label: (option.textContent || '').trim(),
+                            categoryId: option.dataset.categoryId || '',
+                            units,
+                            defaultUnitId,
+                        };
+
+                        byId.set(payload.id, payload);
+                        if (payload.code) {
+                            byCode.set(payload.code, payload);
+                        }
+                    });
+
+                return { byId, byCode };
+            }
+
+            const productIndex = buildProductIndex();
+
+            function updateSmartScanStatus(message, variant = 'info') {
+                if (!smartScanStatus) {
+                    return;
+                }
+                smartScanStatus.dataset.variant = variant;
+                if (smartScanStatusText) {
+                    smartScanStatusText.textContent = message;
+                } else {
+                    smartScanStatus.textContent = message;
+                }
+            }
+
+            function showSmartScanPanel() {
+                if (!smartScanPanel) {
+                    return;
+                }
+                smartScanPanel.hidden = false;
+                smartScanPanel.classList.add('is-visible');
+            }
+
+            function hideSmartScanPanel() {
+                if (!smartScanPanel) {
+                    return;
+                }
+                smartScanPanel.classList.remove('is-visible');
+                smartScanPanel.hidden = true;
+            }
+
+            function stopSmartScan() {
+                smartScanActive = false;
+                if (smartScanFrameHandle) {
+                    window.cancelAnimationFrame(smartScanFrameHandle);
+                    smartScanFrameHandle = null;
+                }
+                if (smartScanStream) {
+                    smartScanStream.getTracks().forEach((track) => track.stop());
+                    smartScanStream = null;
+                }
+                if (smartScanVideo) {
+                    smartScanVideo.pause();
+                    smartScanVideo.srcObject = null;
+                    smartScanVideo.classList.remove('smart-scan__video--unmirror');
+                }
+            }
+
+            async function ensureBarcodeDetector() {
+                if (!('BarcodeDetector' in window)) {
+                    return null;
+                }
+                if (barcodeDetector) {
+                    return barcodeDetector;
+                }
+                try {
+                    const supportedFormats = await window.BarcodeDetector.getSupportedFormats();
+                    const formats = supportedFormats.includes('qr_code') ? ['qr_code'] : supportedFormats;
+                    if (!formats.length) {
+                        return null;
+                    }
+                    barcodeDetector = new window.BarcodeDetector({ formats });
+                    return barcodeDetector;
+                } catch (error) {
+                    console.warn('BarcodeDetector tidak tersedia', error);
+                    return null;
+                }
+            }
+
+            async function detectWithBarcodeDetector() {
+                if (!smartScanVideo) {
+                    return null;
+                }
+                const detector = await ensureBarcodeDetector();
+                if (!detector) {
+                    return null;
+                }
+                if (smartScanVideo.readyState < 2) {
+                    return null;
+                }
+                try {
+                    const results = await detector.detect(smartScanVideo);
+                    if (results && results.length) {
+                        const match = results[0];
+                        return match.rawValue || (match.rawData ? new TextDecoder().decode(match.rawData) : null);
+                    }
+                } catch (error) {
+                    console.warn('Deteksi BarcodeDetector gagal', error);
+                }
+                return null;
+            }
+
+            async function ensureJsqr() {
+                if (window.jsQR) {
+                    return window.jsQR;
+                }
+                if (jsqrLoader) {
+                    try {
+                        return await jsqrLoader;
+                    } catch (error) {
+                        return null;
+                    }
+                }
+
+                jsqrLoader = new Promise((resolve, reject) => {
+                    const script = document.createElement('script');
+                    script.src = 'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js';
+                    script.async = true;
+                    script.onload = () => resolve(window.jsQR || null);
+                    script.onerror = () => reject(new Error('Gagal memuat jsQR'));
+                    document.head.appendChild(script);
+                });
+
+                try {
+                    return await jsqrLoader;
+                } catch (error) {
+                    console.warn('jsQR tidak dapat dimuat', error);
+                    return null;
+                }
+            }
+
+            async function detectWithJsqr() {
+                if (!smartScanVideo || !smartScanCanvas) {
+                    return null;
+                }
+                if (smartScanVideo.readyState < 2) {
+                    return null;
+                }
+
+                const jsqr = await ensureJsqr();
+                if (!jsqr) {
+                    return null;
+                }
+
+                const videoWidth = smartScanVideo.videoWidth;
+                const videoHeight = smartScanVideo.videoHeight;
+                if (!videoWidth || !videoHeight) {
+                    return null;
+                }
+
+                const targetWidth = 480;
+                const scale = Math.min(1, targetWidth / videoWidth);
+                const canvasWidth = Math.max(1, Math.floor(videoWidth * scale));
+                const canvasHeight = Math.max(1, Math.floor(videoHeight * scale));
+
+                smartScanCanvas.width = canvasWidth;
+                smartScanCanvas.height = canvasHeight;
+
+                const ctx = smartScanCanvas.getContext('2d', { willReadFrequently: true });
+                if (!ctx) {
+                    return null;
+                }
+
+                ctx.drawImage(smartScanVideo, 0, 0, canvasWidth, canvasHeight);
+                const imageData = ctx.getImageData(0, 0, canvasWidth, canvasHeight);
+                const result = jsqr(imageData.data, imageData.width, imageData.height);
+                return result ? result.data : null;
+            }
+
+            function parseProductPayload(rawValue) {
+                if (rawValue === undefined || rawValue === null) {
+                    return null;
+                }
+                const text = typeof rawValue === 'string' ? rawValue.trim() : String(rawValue).trim();
+                if (!text) {
+                    return null;
+                }
+
+                try {
+                    const parsed = JSON.parse(text);
+                    if (parsed && typeof parsed === 'object') {
+                        return {
+                            id: parsed.id !== undefined && parsed.id !== null ? String(parsed.id) : '',
+                            code: parsed.code !== undefined && parsed.code !== null ? String(parsed.code) : '',
+                            type: parsed.type || '',
+                            raw: text,
+                        };
+                    }
+                } catch (error) {
+                    // bukan JSON, lanjutkan.
+                }
+
+                if (/^\d+$/.test(text)) {
+                    return { id: text, code: '', raw: text };
+                }
+
+                return { id: '', code: text, raw: text };
+            }
+
+            function resolveScannedProduct(parsedPayload) {
+                if (!parsedPayload) {
+                    return null;
+                }
+
+                if (parsedPayload.id && productIndex.byId.has(parsedPayload.id)) {
+                    return productIndex.byId.get(parsedPayload.id);
+                }
+
+                if (parsedPayload.code && productIndex.byCode.has(parsedPayload.code)) {
+                    return productIndex.byCode.get(parsedPayload.code);
+                }
+
+                if (parsedPayload.code) {
+                    const normalized = parsedPayload.code.trim().toUpperCase();
+                    for (const [code, product] of productIndex.byCode.entries()) {
+                        if (code.toUpperCase() === normalized) {
+                            return product;
+                        }
+                    }
+                }
+
+                return null;
+            }
+
+            function findRowByProductAndUnit(productId, unitId) {
+                const rows = itemsBody ? Array.from(itemsBody.querySelectorAll('.item-row')) : [];
+                return rows.find((row) => {
+                    const productSelect = row.querySelector('.product-select');
+                    const unitSelect = row.querySelector('.unit-select');
+                    if (!productSelect || !unitSelect) {
+                        return false;
+                    }
+                    const sameProduct = productSelect.value === String(productId);
+                    const sameUnit = unitId ? unitSelect.value === String(unitId) : true;
+                    return sameProduct && sameUnit;
+                }) || null;
+            }
+
+            function findEmptyRow() {
+                const rows = itemsBody ? Array.from(itemsBody.querySelectorAll('.item-row')) : [];
+                return rows.find((row) => {
+                    const productSelect = row.querySelector('.product-select');
+                    return productSelect && !productSelect.value;
+                }) || null;
+            }
+
+            function addProductFromScan(product) {
+                if (!product) {
+                    updateSmartScanStatus('QR terbaca, tetapi produk tidak ada di daftar POS.', 'error');
+                    return;
+                }
+
+                const unitId = product.defaultUnitId || (product.units.length ? String(product.units[0].id) : '');
+                if (!unitId) {
+                    updateSmartScanStatus('Produk belum memiliki satuan yang dapat dipilih.', 'error');
+                    return;
+                }
+
+                const existingRow = findRowByProductAndUnit(product.id, unitId);
+                if (existingRow) {
+                    const qtyInput = existingRow.querySelector('.quantity-input');
+                    if (qtyInput) {
+                        const current = Number(qtyInput.value || 0);
+                        qtyInput.value = Math.max(0, current) + 1;
+                        qtyInput.dispatchEvent(new Event('input', { bubbles: true }));
+                    }
+                    updateSmartScanStatus(`Jumlah ditambah untuk ${product.label}`, 'success');
+                    existingRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    return;
+                }
+
+                const emptyRow = findEmptyRow();
+                if (emptyRow) {
+                    hydrateRowFromData(emptyRow, {
+                        category_id: product.categoryId || '',
+                        product_id: product.id,
+                        product_unit_id: unitId,
+                        quantity: 1,
+                    });
+                    emptyRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    updateSmartScanStatus(`Ditambahkan: ${product.label}`, 'success');
+                    return;
+                }
+
+                const newRow = addRow({
+                    category_id: product.categoryId || '',
+                    product_id: product.id,
+                    product_unit_id: unitId,
+                    quantity: 1,
+                }, { prepend: true });
+                if (newRow) {
+                    newRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                updateSmartScanStatus(`Ditambahkan: ${product.label}`, 'success');
+            }
+
+            function handleSmartScanResult(rawValue) {
+                const now = Date.now();
+                const text = typeof rawValue === 'string' ? rawValue.trim() : String(rawValue).trim();
+                if (!text) {
+                    return;
+                }
+                if (text === lastScanValue && now - lastScanAt < 1500) {
+                    return;
+                }
+                lastScanValue = text;
+                lastScanAt = now;
+
+                const parsedPayload = parseProductPayload(text);
+                const product = resolveScannedProduct(parsedPayload);
+                if (!product) {
+                    updateSmartScanStatus('QR terbaca, tetapi tidak cocok dengan produk manapun.', 'error');
+                    return;
+                }
+                addProductFromScan(product);
+                persistFormState();
+            }
+
+            async function processSmartScanFrame() {
+                if (!smartScanActive) {
+                    return;
+                }
+
+                let value = await detectWithBarcodeDetector();
+                if (!value) {
+                    value = await detectWithJsqr();
+                }
+
+                if (value) {
+                    handleSmartScanResult(value);
+                }
+
+                smartScanFrameHandle = window.requestAnimationFrame(processSmartScanFrame);
+            }
+
+            async function startSmartScan() {
+                if (!smartScanToggle || !smartScanPanel) {
+                    return;
+                }
+
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                    updateSmartScanStatus('Browser tidak mendukung akses kamera.', 'error');
+                    return;
+                }
+
+                showSmartScanPanel();
+                updateSmartScanStatus('Mengaktifkan kamera...', 'info');
+
+                try {
+                    smartScanStream = await navigator.mediaDevices.getUserMedia({
+                        video: { facingMode: { ideal: 'environment' } },
+                        audio: false,
+                    });
+
+                    if (smartScanVideo) {
+                        smartScanVideo.srcObject = smartScanStream;
+                        await smartScanVideo.play();
+
+                        const track = smartScanStream.getVideoTracks()[0];
+                        const facing = track && track.getSettings ? track.getSettings().facingMode : null;
+                        const shouldUnmirror = facing === 'user' || facing === undefined;
+                        smartScanVideo.classList.toggle('smart-scan__video--unmirror', !!shouldUnmirror);
+                    }
+
+                    smartScanActive = true;
+                    lastScanValue = '';
+                    lastScanAt = 0;
+                    updateSmartScanStatus('Arahkan QR produk ke area kamera.', 'info');
+                    processSmartScanFrame();
+                } catch (error) {
+                    console.error('Gagal memulai pemindaian', error);
+                    updateSmartScanStatus('Tidak bisa mengakses kamera. Izinkan akses atau coba perangkat lain.', 'error');
+                    stopSmartScan();
                 }
             }
 
@@ -2145,7 +2782,7 @@
                 updateRow(row);
             }
 
-            function addRow(prefillData = null) {
+            function addRow(prefillData = null, { prepend = false } = {}) {
                 const fragment = template.content.cloneNode(true);
 
                 fragment.querySelectorAll('[data-name]').forEach((input) => {
@@ -2154,7 +2791,11 @@
                 });
 
                 const row = fragment.querySelector('.item-row');
-                itemsBody.appendChild(row);
+                if (prepend && itemsBody.firstChild) {
+                    itemsBody.insertBefore(row, itemsBody.firstChild);
+                } else {
+                    itemsBody.appendChild(row);
+                }
                 attachRowEvents(row);
                 if (prefillData) {
                     hydrateRowFromData(row, prefillData);
@@ -2162,11 +2803,35 @@
 
                 rowIndex += 1;
                 persistFormState();
+                return row;
             }
 
-            addItemBtn.addEventListener('click', function () {
-                addRow();
-            });
+            if (addItemBtn) {
+                addItemBtn.addEventListener('click', function () {
+                    addRow();
+                });
+            }
+
+            if (smartScanToggle) {
+                smartScanToggle.addEventListener('click', () => {
+                    const isActive = smartScanActive && smartScanPanel && !smartScanPanel.hidden;
+                    if (isActive) {
+                        stopSmartScan();
+                        hideSmartScanPanel();
+                        updateSmartScanStatus('Pemindaian dihentikan. Tekan ikon kamera untuk memulai lagi.', 'info');
+                    } else {
+                        startSmartScan();
+                    }
+                });
+            }
+
+            if (smartScanClose) {
+                smartScanClose.addEventListener('click', () => {
+                    stopSmartScan();
+                    hideSmartScanPanel();
+                    updateSmartScanStatus('Pemindaian ditutup.', 'info');
+                });
+            }
 
             let restoredFromDraft = false;
             if (!hasOldInput && !isEditing) {
@@ -2210,6 +2875,8 @@
                     if (paymentAmountDisplay) {
                         syncPaymentInputs(paymentAmountDisplay.value);
                     }
+                    stopSmartScan();
+                    hideSmartScanPanel();
                     clearPersistedFormState();
                 });
 
@@ -2218,10 +2885,16 @@
                         if (paymentAmountDisplay) {
                             syncPaymentInputs(paymentAmountDisplay.value);
                         }
+                        stopSmartScan();
+                        hideSmartScanPanel();
                         clearPersistedFormState();
                     });
                 });
             }
+
+            window.addEventListener('pagehide', () => {
+                stopSmartScan();
+            });
 
             updateTotals();
         });

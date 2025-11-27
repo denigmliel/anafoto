@@ -104,6 +104,12 @@
 
             <div class="product-actions">
                 <a
+                    href="{{ route('gudang.products.qr', $product) }}"
+                    class="chip-button chip-button--blue product-action-button"
+                >
+                    Lihat QR Code
+                </a>
+                <a
                     href="{{ route('gudang.products.edit', $product) }}"
                     class="chip-button chip-button--gray product-action-button"
                 >

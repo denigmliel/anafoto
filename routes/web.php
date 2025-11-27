@@ -29,6 +29,7 @@ Route::middleware('auth')->prefix('gudang')->name('gudang.')->group(function () 
     Route::get('/products/create', [GudangController::class, 'productsCreate'])->name('products.create');
     Route::post('/products', [GudangController::class, 'productsStore'])->name('products.store');
     Route::get('/products/low-stock', [GudangController::class, 'productsLowStock'])->name('products.low_stock');
+    Route::get('/products/{product}/qr', [GudangController::class, 'productsQr'])->name('products.qr');
     Route::get('/products/{product}', [GudangController::class, 'productsShow'])->name('products.show');
     Route::get('/products/{product}/edit', [GudangController::class, 'productsEdit'])->name('products.edit');
     Route::put('/products/{product}', [GudangController::class, 'productsUpdate'])->name('products.update');

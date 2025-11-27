@@ -416,6 +416,7 @@
                             </td>
                             <td>{{ $product->is_active ? 'Aktif' : 'Nonaktif' }}</td>
                             <td style="text-align: right; display: flex; justify-content: flex-end; gap: 8px;">
+                                <a href="{{ route('gudang.products.qr', $product) }}" class="chip-button chip-button--gray">QR Code</a>
                                 <a href="{{ route('gudang.products.show', $product) }}" class="chip-button chip-button--yellow">Detail</a>
                                 <a href="{{ route('gudang.products.edit', $product) }}?redirect_to={{ urlencode(request()->fullUrl()) }}" class="chip-button chip-button--blue">Edit</a>
                                 <form

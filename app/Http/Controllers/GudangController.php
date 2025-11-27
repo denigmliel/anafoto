@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class GudangController extends Controller
 {
@@ -280,6 +281,29 @@ class GudangController extends Controller
             ->get();
 
         return view('gudang.products.show', compact('product', 'recentMovements'));
+    }
+
+    public function productsQr(Product $product)
+    {
+        $product->load('category');
+
+        $payload = $this->buildProductQrPayload($product);
+        $qrSvg = QrCode::format('svg')
+            ->size(360)
+            ->margin(1)
+            ->errorCorrection('M')
+            ->generate($payload);
+
+        $labelCode = $product->code
+            ? $product->code
+            : 'ID-' . str_pad((string) $product->id, 4, '0', STR_PAD_LEFT);
+
+        return view('gudang.products.qr', [
+            'product' => $product,
+            'labelCode' => $labelCode,
+            'qrSvg' => $qrSvg,
+            'qrPayload' => $payload,
+        ]);
     }
 
     public function productsEdit(Request $request, Product $product)
@@ -608,6 +632,24 @@ class GudangController extends Controller
             'pageActive',
             'pageInactive'
         ));
+    }
+
+    private function buildProductQrPayload(Product $product): string
+    {
+        $payload = [
+            'type' => 'product',
+            'id' => $product->id,
+            'code' => $product->code ?? null,
+            'name' => $product->name,
+            'unit' => $product->unit,
+            'price' => (float) $product->price,
+        ];
+
+        if ($product->category) {
+            $payload['category'] = $product->category->name;
+        }
+
+        return json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     }
 
     protected function generateProductCode(): string
