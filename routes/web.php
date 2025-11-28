@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\KasirController;
 use App\Http\Controllers\GudangController;
 use App\Http\Controllers\AdminDashboardController;
+use App\Http\Controllers\PosScannerController;
 
 Route::get('/', [AuthController::class, 'showLoginForm']);
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
@@ -21,6 +22,9 @@ Route::middleware('auth')->prefix('kasir')->name('kasir.')->group(function () {
     Route::post('/transaction', [KasirController::class, 'createTransaction'])->name('transaction.create');
     Route::get('/transaction/{id}/print', [KasirController::class, 'printReceipt'])->name('transaction.print');
     Route::get('/transaction/history', [KasirController::class, 'transactionHistory'])->name('transaction.history');
+    Route::get('/mobile-scanner', [PosScannerController::class, 'index'])->name('mobile.scanner');
+    Route::post('/scan-item', [PosScannerController::class, 'store'])->name('scan.store');
+    Route::get('/check-scan', [PosScannerController::class, 'check'])->name('scan.check');
 });
 
 Route::middleware('auth')->prefix('gudang')->name('gudang.')->group(function () {

@@ -19,18 +19,24 @@
             background-color: #f4f6f8;
             color: #1d2939;
             --sidebar-width: 220px;
+            --sidebar-transition: 0.25s ease;
         }
 
         body {
             margin: 0;
             background-color: #f4f6f8;
             overflow-x: auto;
+            min-height: 100vh;
         }
 
         .layout {
             min-height: 100vh;
             display: grid;
             grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+        }
+
+        .layout.has-sidebar-open {
+            overflow: hidden;
         }
 
         .sidebar {
@@ -46,6 +52,8 @@
             overflow-y: auto;
             justify-content: space-between;
             width: var(--sidebar-width);
+            z-index: 1001;
+            transition: transform var(--sidebar-transition), box-shadow var(--sidebar-transition);
         }
 
         .brand {
@@ -194,6 +202,83 @@
 
         .logout-button span {
             pointer-events: none;
+        }
+
+        .sidebar-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.38);
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity var(--sidebar-transition), visibility var(--sidebar-transition);
+            z-index: 1000;
+        }
+
+        .layout.has-sidebar-open .sidebar-overlay {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+
+        .sidebar-toggle {
+            position: fixed;
+            top: 14px;
+            right: 14px;
+            width: 46px;
+            height: 46px;
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(135deg, #b91c1c 0%, #7f1d1d 100%);
+            color: #fff;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.18);
+            cursor: pointer;
+            z-index: 1002;
+            transition: transform 0.16s ease, box-shadow 0.16s ease, filter 0.16s ease;
+        }
+
+        .sidebar-toggle:hover {
+            transform: translateY(-1px);
+            filter: brightness(1.05);
+            box-shadow: 0 14px 28px rgba(0, 0, 0, 0.22);
+        }
+
+        .sidebar-toggle:active {
+            transform: translateY(0);
+        }
+
+        .sidebar-toggle__icon,
+        .sidebar-toggle__icon::before,
+        .sidebar-toggle__icon::after {
+            display: block;
+            width: 22px;
+            height: 2px;
+            background: currentColor;
+            border-radius: 2px;
+            position: absolute;
+            left: 0;
+            transition: transform 0.2s ease, opacity 0.2s ease;
+            content: '';
+        }
+
+        .sidebar-toggle__icon {
+            position: relative;
+        }
+
+        .sidebar-toggle__icon::before { top: -7px; }
+        .sidebar-toggle__icon::after { top: 7px; }
+
+        .layout.has-sidebar-open .sidebar-toggle__icon {
+            background: transparent;
+        }
+        .layout.has-sidebar-open .sidebar-toggle__icon::before {
+            transform: translateY(7px) rotate(45deg);
+        }
+        .layout.has-sidebar-open .sidebar-toggle__icon::after {
+            transform: translateY(-7px) rotate(-45deg);
         }
 
         .content {
@@ -431,6 +516,59 @@
             :root {
                 --sidebar-width: 180px;
             }
+
+            body {
+                overflow-x: hidden;
+            }
+
+            .layout {
+                display: flex;
+                flex-direction: column;
+                width: 100%;
+                min-height: 100vh;
+            }
+
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: min(82vw, 320px);
+                max-width: 340px;
+                height: 100vh;
+                max-height: 100vh;
+                padding: 18px 16px;
+                overflow-y: auto;
+                box-shadow: 0 16px 40px rgba(0, 0, 0, 0.24);
+                border-radius: 0;
+                transform: translateX(-100%);
+            }
+
+            .layout.has-sidebar-open .sidebar {
+                transform: translateX(0);
+            }
+
+            .sidebar-toggle {
+                display: inline-flex;
+            }
+
+            .content {
+                margin-left: 0;
+                width: 100%;
+                max-width: 100%;
+                padding: 16px 14px 60px;
+                min-height: auto;
+                height: auto;
+                overflow: visible;
+                margin-top: 62px;
+            }
+
+            .main-content {
+                min-height: auto;
+            }
+
+            .app-footer {
+                padding: 14px;
+            }
         }
 
         @media (max-width: 640px) {
@@ -457,6 +595,17 @@
 <body>
     <div class="layout">
         @include('layouts.partials.sidebar')
+
+        <div class="sidebar-overlay" id="sidebar-overlay" aria-hidden="true"></div>
+        <button
+            type="button"
+            class="sidebar-toggle"
+            id="sidebar-toggle"
+            aria-label="Buka menu"
+            aria-expanded="false"
+        >
+            <span class="sidebar-toggle__icon" aria-hidden="true"></span>
+        </button>
 
         <div class="content">
             <main class="main-content">
@@ -519,5 +668,61 @@
             });
         </script>
     @endif
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const layout = document.querySelector('.layout');
+            const sidebar = document.querySelector('.sidebar');
+            const toggle = document.getElementById('sidebar-toggle');
+            const overlay = document.getElementById('sidebar-overlay');
+
+            if (!layout || !sidebar || !toggle || !overlay) {
+                return;
+            }
+
+            const setExpanded = (state) => toggle.setAttribute('aria-expanded', state ? 'true' : 'false');
+
+            const closeSidebar = () => {
+                layout.classList.remove('has-sidebar-open');
+                setExpanded(false);
+            };
+
+            const openSidebar = () => {
+                layout.classList.add('has-sidebar-open');
+                setExpanded(true);
+            };
+
+            const toggleSidebar = () => {
+                if (layout.classList.contains('has-sidebar-open')) {
+                    closeSidebar();
+                } else {
+                    openSidebar();
+                }
+            };
+
+            toggle.addEventListener('click', toggleSidebar);
+            overlay.addEventListener('click', closeSidebar);
+
+            sidebar.querySelectorAll('a').forEach((link) => {
+                link.addEventListener('click', () => {
+                    if (window.innerWidth <= 768) {
+                        closeSidebar();
+                    }
+                });
+            });
+
+            window.addEventListener('resize', () => {
+                if (window.innerWidth > 768) {
+                    closeSidebar();
+                }
+            });
+
+            window.addEventListener('keyup', (event) => {
+                if (event.key === 'Escape') {
+                    closeSidebar();
+                }
+            });
+        });
+    </script>
 </body>
 </html>

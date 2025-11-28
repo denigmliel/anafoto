@@ -156,7 +156,7 @@
             align-items: start;
         }
 
-        @media (max-width: 1024px) {
+        @media (max-width: 768px) {
             .items-header,
             .item-row {
                 grid-template-columns: minmax(180px, 1fr);
@@ -3036,6 +3036,81 @@
             window.addEventListener('pagehide', () => {
                 stopSmartScan();
             });
+
+            const remoteScanEndpoint = "{{ route('kasir.scan.check') }}";
+            let remoteScanInterval = null;
+
+            const selectProductByCode = (code) => {
+                const normalized = (code || '').trim().toLowerCase();
+                if (!normalized || !itemsBody) {
+                    return false;
+                }
+
+                const ensureRow = () => {
+                    const emptyRow = Array.from(itemsBody.querySelectorAll('.item-row')).find((row) => {
+                        const select = row.querySelector('.product-select');
+                        return select && !select.value;
+                    });
+
+                    return emptyRow || addRow();
+                };
+
+                const row = ensureRow();
+                const productSelect = row ? row.querySelector('.product-select') : null;
+                if (!productSelect) {
+                    return false;
+                }
+
+                const match = Array.from(productSelect.options).find((option) => {
+                    const optionCode = (option.dataset.productCode || '').toLowerCase();
+                    return optionCode === normalized;
+                });
+
+                if (!match) {
+                    return false;
+                }
+
+                if (productSelect.value !== match.value) {
+                    productSelect.value = match.value;
+                    productSelect.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+
+                const qtyInput = row.querySelector('.quantity-input');
+                if (qtyInput && (!qtyInput.value || Number(qtyInput.value) <= 0)) {
+                    qtyInput.value = '1';
+                    qtyInput.dispatchEvent(new Event('input', { bubbles: true }));
+                }
+
+                updateRow(row);
+                persistFormState();
+                return true;
+            };
+
+            const startRemoteScanPolling = () => {
+                if (remoteScanInterval) {
+                    return;
+                }
+
+                remoteScanInterval = window.setInterval(async () => {
+                    try {
+                        const response = await fetch(remoteScanEndpoint, {
+                            headers: { Accept: 'application/json' },
+                        });
+                        const data = await response.json();
+
+                        if (data && data.found && data.code) {
+                            const handled = selectProductByCode(data.code);
+                            if (!handled) {
+                                console.warn('Kode scan tidak dikenali:', data.code);
+                            }
+                        }
+                    } catch (error) {
+                        console.warn('Gagal polling scan:', error);
+                    }
+                }, 1500);
+            };
+
+            startRemoteScanPolling();
 
             updateTotals();
         });

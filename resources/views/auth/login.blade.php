@@ -14,10 +14,10 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #1e3c72 0%, #2a5298 40%, #9b2e5a 75%, #c9302c 100%);
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
+            display: grid;
+            place-items: center;
+            padding: 12px;
+            overflow: hidden;
         }
 
         .login-container {
@@ -30,6 +30,7 @@
             display: flex;
             flex-direction: column;
             animation: slideUp 0.5s ease-out;
+            max-height: 92vh;
         }
 
         @keyframes slideUp {
@@ -45,7 +46,7 @@
 
         .login-left {
             background: linear-gradient(135deg, #c9302c 0%, #e74c3c 100%);
-            padding: 32px 28px 26px;
+            padding: 28px 24px 22px;
             flex: none;
             color: white;
             display: flex;
@@ -84,7 +85,7 @@
         }
 
         .login-right {
-            padding: 26px 26px 32px;
+            padding: 22px 22px 26px;
             flex: none;
             background: white;
         }
@@ -269,14 +270,17 @@
         @media (max-width: 640px) {
             .login-container {
                 border-radius: 16px;
+                max-height: none;
+                min-height: calc(100vh - 24px);
+                overflow: auto;
             }
 
             .login-left {
-                padding: 28px 22px 22px;
+                padding: 24px 18px 20px;
             }
 
             .login-right {
-                padding: 24px 20px 28px;
+                padding: 20px 16px 24px;
             }
 
         }
