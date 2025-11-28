@@ -3046,6 +3046,13 @@
                     return false;
                 }
 
+                const findExistingRow = (value) => {
+                    return Array.from(itemsBody.querySelectorAll('.item-row')).find((row) => {
+                        const select = row.querySelector('.product-select');
+                        return select && select.value === value;
+                    });
+                };
+
                 const ensureRow = () => {
                     const emptyRow = Array.from(itemsBody.querySelectorAll('.item-row')).find((row) => {
                         const select = row.querySelector('.product-select');
@@ -3068,6 +3075,19 @@
 
                 if (!match) {
                     return false;
+                }
+
+                const existingRow = findExistingRow(match.value);
+                if (existingRow) {
+                    const qtyInput = existingRow.querySelector('.quantity-input');
+                    const current = qtyInput ? Number(qtyInput.value || 0) : 0;
+                    if (qtyInput) {
+                        qtyInput.value = String(Math.max(current, 0) + 1);
+                        qtyInput.dispatchEvent(new Event('input', { bubbles: true }));
+                    }
+                    updateRow(existingRow);
+                    persistFormState();
+                    return true;
                 }
 
                 if (productSelect.value !== match.value) {
