@@ -32,6 +32,11 @@
     <div id="debug-msg" class="muted" style="word-break: break-all;"></div>
     <div class="muted">Pastikan kamera diizinkan.</div>
 
+    @php
+        // Gunakan path relatif agar tidak terpengaruh APP_URL di hosting.
+        $scanUrl = route('kasir.scan.store', [], false);
+    @endphp
+
     <script>
         const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
         const statusMsg = document.getElementById('status-msg');
@@ -52,7 +57,7 @@
             updateStatus('Mengirim: ' + decodedText + ' ...', '#facc15');
             showDebug('');
             try {
-                const response = await fetch("{{ route('kasir.scan.store') }}", {
+                const response = await fetch("{{ $scanUrl }}", {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -68,15 +73,15 @@
 
                 if (!response.ok) {
                     const detail = rawText.slice(0, 400);
-                    if (response.status === 404) throw new Error('Route /scan-item tidak ditemukan (404). Pastikan kode terbaru sudah di-deploy. Detail: ' + detail);
-                    if (response.status === 401) throw new Error('Belum login (401). Silakan login ulang di domain yang sama.');
-                    if (response.status === 419) throw new Error('Sesi/CSRF kedaluwarsa (419). Refresh halaman dan login ulang.');
+                    if (response.status === 404) throw new Error('404: scan-item tidak ditemukan. Deploy kode terbaru & route:clear. Detail: ' + detail);
+                    if (response.status === 401) throw new Error('401: Belum login. Login ulang di domain yang sama.');
+                    if (response.status === 419) throw new Error('419: Sesi/CSRF kedaluwarsa. Refresh halaman & login ulang.');
                     if (response.status === 500) {
                         let parsed;
                         try { parsed = JSON.parse(rawText); } catch (e) { parsed = {}; }
-                        throw new Error(parsed.message || ('Error server (500). ' + detail));
+                        throw new Error(parsed.message || ('500: Error server. ' + detail));
                     }
-                    throw new Error('Gagal: HTTP ' + response.status + '. ' + detail);
+                    throw new Error('HTTP ' + response.status + '. ' + detail);
                 }
 
                 let data = {};
@@ -100,9 +105,10 @@
                 }, 1200);
             } catch (error) {
                 console.error(error);
-                updateStatus('Gagal: ' + error.message, '#f87171');
-                showDebug('Debug: ' + (error && error.message ? error.message : 'Tanpa pesan'));
-                alert(error && error.message ? error.message : 'Terjadi kesalahan saat mengirim. Lihat debug di bawah.');
+                const msg = error && error.message ? error.message : 'Terjadi kesalahan saat mengirim. Lihat debug di bawah.';
+                updateStatus('Gagal: ' + msg, '#f87171');
+                showDebug('Debug: ' + msg);
+                alert(msg);
                 setTimeout(() => updateStatus('Siap scan...'), 1500);
             }
         }
