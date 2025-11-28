@@ -58,6 +58,7 @@
         const modalName = document.getElementById('modal-name');
         const modalPrice = document.getElementById('modal-price');
         const modalClose = document.getElementById('modal-close');
+        let isSending = false;
 
         function updateStatus(text, color = '#f8fafc') {
             statusMsg.textContent = text;
@@ -91,6 +92,26 @@
         const hideSuccessModal = () => {
             if (!successModal) return;
             successModal.style.display = 'none';
+        };
+
+        const pauseScanner = () => {
+            try {
+                if (window.html5QrcodeScanner && typeof html5QrcodeScanner.pause === 'function') {
+                    html5QrcodeScanner.pause();
+                }
+            } catch (e) {
+                console.warn('Gagal pause scanner:', e);
+            }
+        };
+
+        const resumeScanner = () => {
+            try {
+                if (window.html5QrcodeScanner && typeof html5QrcodeScanner.resume === 'function') {
+                    html5QrcodeScanner.resume();
+                }
+            } catch (e) {
+                console.warn('Gagal resume scanner:', e);
+            }
         };
 
         async function sendCode(decodedText) {
@@ -169,14 +190,6 @@
                 showDebug(productName ? `Ditambahkan: ${productName}` : ''); // info item berhasil masuk
 
                 showSuccessModal({ code: parsedCode, name: productName, price: productPrice });
-
-                try {
-                    if (window.html5QrcodeScanner && typeof html5QrcodeScanner.pause === 'function') {
-                        html5QrcodeScanner.pause();
-                    }
-                } catch (e) {
-                    console.warn('Gagal pause scanner:', e);
-                }
             } catch (error) {
                 console.error(error);
                 const rawSnippet = (lastRaw || '').slice(0, 400);
@@ -184,7 +197,11 @@
                 updateStatus('Gagal: ' + msg, '#f87171');
                 showDebug('Debug: ' + msg + (lastStatus ? ' | HTTP ' + lastStatus : '') + (rawSnippet ? ' | Raw: ' + rawSnippet : ''));
                 alert(msg + (lastStatus ? '\nStatus: ' + lastStatus : '') + (rawSnippet ? '\nRaw: ' + rawSnippet : ''));
-                setTimeout(() => updateStatus('Siap scan...'), 1500);
+                setTimeout(() => {
+                    updateStatus('Siap scan...');
+                    isSending = false;
+                    resumeScanner();
+                }, 1500);
             }
         }
 
@@ -192,6 +209,11 @@
             if (!decodedText) {
                 return;
             }
+            if (isSending) {
+                return;
+            }
+            isSending = true;
+            pauseScanner();
             sendCode(decodedText);
         }
 
@@ -204,13 +226,10 @@
         if (modalClose) {
             modalClose.addEventListener('click', () => {
                 hideSuccessModal();
+                isSending = false;
                 if (window.html5QrcodeScanner && typeof html5QrcodeScanner.resume === 'function') {
                     updateStatus('Siap scan...');
-                    try {
-                        html5QrcodeScanner.resume();
-                    } catch (e) {
-                        console.warn('Gagal resume scanner:', e);
-                    }
+                    resumeScanner();
                 }
             });
         }
