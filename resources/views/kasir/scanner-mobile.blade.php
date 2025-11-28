@@ -54,7 +54,17 @@
         };
 
         async function sendCode(decodedText) {
-            updateStatus('Mengirim: ' + decodedText + ' ...', '#facc15');
+            let parsedCode = decodedText;
+            try {
+                const parsed = JSON.parse(decodedText);
+                if (parsed && typeof parsed === 'object' && parsed.code) {
+                    parsedCode = parsed.code;
+                }
+            } catch (e) {
+                // biarkan parsedCode tetap decodedText jika bukan JSON
+            }
+
+            updateStatus('Mengirim: ' + parsedCode + ' ...', '#facc15');
             showDebug('');
             let lastStatus = null;
             let lastRaw = '';
@@ -68,7 +78,7 @@
                         'X-CSRF-TOKEN': csrfToken,
                     },
                     credentials: 'same-origin',
-                    body: JSON.stringify({ code: decodedText }),
+                    body: JSON.stringify({ code: parsedCode }),
                 });
 
                 let rawText = '';
@@ -103,7 +113,7 @@
                     throw new Error((data && data.message) || 'Gagal mengirim scan (respons tidak success).');
                 }
 
-                updateStatus('Berhasil: ' + decodedText, '#4ade80');
+                updateStatus('Berhasil: ' + parsedCode, '#4ade80');
                 showDebug(''); // bersihkan debug pada sukses
 
                 if (window.html5QrcodeScanner && typeof html5QrcodeScanner.pause === 'function') {
