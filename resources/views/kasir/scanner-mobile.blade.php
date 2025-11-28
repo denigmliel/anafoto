@@ -104,11 +104,15 @@
                 }
 
                 updateStatus('Berhasil: ' + decodedText, '#4ade80');
-                html5QrcodeScanner.pause();
-                setTimeout(() => {
-                    updateStatus('Siap scan...');
-                    html5QrcodeScanner.resume();
-                }, 1200);
+                showDebug(''); // bersihkan debug pada sukses
+
+                if (window.html5QrcodeScanner && typeof html5QrcodeScanner.pause === 'function') {
+                    html5QrcodeScanner.pause();
+                    setTimeout(() => {
+                        updateStatus('Siap scan...');
+                        html5QrcodeScanner.resume();
+                    }, 1200);
+                }
             } catch (error) {
                 console.error(error);
                 const rawSnippet = (lastRaw || '').slice(0, 400);
