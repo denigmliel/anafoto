@@ -40,7 +40,7 @@
             <div style="font-weight: 800; font-size: 16px; margin-bottom: 8px;">Scan berhasil</div>
             <div id="modal-code" style="font-weight: 700; color: #34d399; margin-bottom: 6px;"></div>
             <div id="modal-name" style="margin-bottom: 6px;"></div>
-            <div id="modal-price" style="color: #facc15; font-weight: 700; margin-bottom: 8px;"></div>
+            <div id="modal-price" style="color: #facc15; font-weight: 700; margin-bottom: 6px;"></div>
             <div style="display: grid; gap: 10px; margin-top: 8px;">
                 <label style="display: grid; gap: 6px; font-size: 14px;">
                     <span style="color: #cbd5e1;">Satuan</span>
@@ -52,6 +52,7 @@
                     <span style="color: #cbd5e1;">Jumlah</span>
                     <input id="modal-qty" type="number" min="1" value="1" inputmode="numeric" style="width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid #1f2937; background: #0f172a; color: #f8fafc; font-weight: 700;" />
                 </label>
+                <div id="modal-total" style="color: #22c55e; font-weight: 800; margin-top: 2px;"></div>
             </div>
             <div style="margin-top: 14px; display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap;">
                 <button id="modal-close" style="background: #334155; color: #e2e8f0; border: none; padding: 10px 14px; border-radius: 10px; font-weight: 700; cursor: pointer;">Batal</button>
@@ -74,12 +75,14 @@
         const modalCode = document.getElementById('modal-code');
         const modalName = document.getElementById('modal-name');
         const modalPrice = document.getElementById('modal-price');
+        const modalTotal = document.getElementById('modal-total');
         const modalClose = document.getElementById('modal-close');
         const modalSubmit = document.getElementById('modal-submit');
         const modalUnit = document.getElementById('modal-unit');
         const modalQty = document.getElementById('modal-qty');
         let isSending = false;
         let pendingScan = null;
+        let currentUnitPrice = 0;
 
         function updateStatus(text, color = '#f8fafc') {
             statusMsg.textContent = text;
@@ -106,11 +109,16 @@
             if (!successModal) return;
             modalCode.textContent = code ? `Kode: ${code}` : '';
             modalName.textContent = name ? `Nama: ${name}` : '';
+            currentUnitPrice = Number(price || 0);
             modalPrice.textContent = typeof price !== 'undefined' ? `Harga: ${formatCurrency(price)}` : '';
+            if (modalTotal) {
+                modalTotal.textContent = '';
+            }
             if (modalQty) {
                 modalQty.value = '1';
             }
             successModal.style.display = 'flex';
+            updateTotals();
         };
 
         const hideSuccessModal = () => {
@@ -210,18 +218,31 @@
                         const opt = document.createElement('option');
                         opt.value = unit.id;
                         opt.textContent = `${unit.name} - ${formatCurrency(unit.price)}`;
+                        opt.dataset.price = unit.price;
                         opt.selected = unit.is_default || (idx === 0);
                         modalUnit.appendChild(opt);
                     });
+                    const selected = modalUnit.options[modalUnit.selectedIndex];
+                    currentUnitPrice = Number(selected?.dataset?.price || scan.price || 0);
                 } else {
                     const opt = document.createElement('option');
                     opt.value = '';
                     opt.textContent = 'Satuan default';
                     modalUnit.appendChild(opt);
+                    currentUnitPrice = Number(scan.price || 0);
                 }
             }
             if (modalQty) {
                 modalQty.value = '1';
+            }
+            updateTotals();
+        };
+
+        const updateTotals = () => {
+            const qty = modalQty ? Math.max(1, Number(modalQty.value || 1)) : 1;
+            modalPrice.textContent = `Harga: ${formatCurrency(currentUnitPrice)}`;
+            if (modalTotal) {
+                modalTotal.textContent = `Total: ${formatCurrency(currentUnitPrice * qty)}`;
             }
         };
 
@@ -346,6 +367,19 @@
             modalSubmit.addEventListener('click', () => {
                 submitToPos();
             });
+        }
+
+        if (modalUnit) {
+            modalUnit.addEventListener('change', () => {
+                const selected = modalUnit.options[modalUnit.selectedIndex];
+                currentUnitPrice = Number(selected?.dataset?.price || currentUnitPrice || 0);
+                updateTotals();
+            });
+        }
+
+        if (modalQty) {
+            modalQty.addEventListener('input', () => updateTotals());
+            modalQty.addEventListener('change', () => updateTotals());
         }
     </script>
 </body>

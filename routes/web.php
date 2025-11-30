@@ -14,6 +14,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard/export', [AdminDashboardController::class, 'exportRecap'])->name('dashboard.export');
 });
 
 Route::middleware('auth')->prefix('kasir')->name('kasir.')->group(function () {

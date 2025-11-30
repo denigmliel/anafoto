@@ -206,6 +206,107 @@
             box-shadow: 0 12px 24px rgba(0, 0, 0, 0.07);
         }
 
+        .recap-combo {
+            position: relative;
+            min-width: 240px;
+        }
+
+        .recap-trigger {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            font-weight: 700;
+            color: #0f172a;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.03);
+            text-align: left;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .recap-trigger:focus {
+            outline: none;
+            border-color: #b91c1c;
+            box-shadow: 0 10px 26px rgba(185, 28, 28, 0.12);
+        }
+
+        .recap-trigger span {
+            display: inline-block;
+        }
+
+        .recap-trigger .chevron {
+            font-size: 12px;
+            color: #94a3b8;
+        }
+
+        .recap-options {
+            position: absolute;
+            top: calc(100% + 6px);
+            right: 0;
+            left: 0;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            box-shadow: 0 14px 34px rgba(15, 23, 42, 0.15);
+            padding: 6px;
+            display: none;
+            z-index: 5;
+        }
+
+        .recap-options.open {
+            display: grid;
+            gap: 6px;
+        }
+
+        .recap-option {
+            text-align: left;
+            width: 100%;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            color: #0f172a;
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.12s ease;
+        }
+
+        .recap-option:hover {
+            border-color: #cbd5e1;
+            transform: translateY(-1px);
+        }
+
+        .recap-option.active {
+            background: #b91c1c;
+            color: #fff;
+            border-color: #b91c1c;
+            box-shadow: 0 12px 28px rgba(185, 28, 28, 0.18);
+        }
+
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            background: #0f172a;
+            color: #fff;
+            font-weight: 700;
+            text-decoration: none;
+            box-shadow: 0 10px 22px rgba(15, 23, 42, 0.12);
+            transition: transform 0.12s ease, box-shadow 0.12s ease;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 12px 28px rgba(15, 23, 42, 0.16);
+        }
+
         @media (max-width: 960px) {
             .chart-layout {
                 grid-template-columns: 1fr;
@@ -275,13 +376,13 @@
         <div class="card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                 <div>
-                    <h2 style="margin: 0; font-size: 18px;">Performa Penjualan Bulan Ini</h2>
-                    <p class="muted" style="margin: 4px 0 0;">Total & jumlah transaksi per hari.</p>
+                    <h2 style="margin: 0; font-size: 18px;">{{ $chartHeading }}</h2>
+                    <p class="muted" style="margin: 4px 0 0;">{{ $chartSubtitle }}</p>
                 </div>
-                <div class="tag">Chart</div>
+                <div class="tag">{{ $chartBadge }}</div>
             </div>
-            @if ($dailySalesLabels->isEmpty())
-                <p class="muted" style="margin: 0;">Belum ada transaksi pada bulan ini.</p>
+            @if ($chartLabels->isEmpty())
+                <p class="muted" style="margin: 0;">Belum ada transaksi pada periode ini.</p>
             @else
                 <div class="chart-wrapper">
                     <canvas id="daily-sales-chart"></canvas>
@@ -289,25 +390,52 @@
             @endif
         </div>
 
+        @php
+            $activeRecapLabel = collect($recapOptionList)->firstWhere('active', true)['label'] ?? $recapHeading;
+        @endphp
         <div class="card">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <h2 style="margin: 0; font-size: 18px;">Rekap Transaksi Bulanan</h2>
-                <span class="tag">6 bulan</span>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap;">
+                <div>
+                    <h2 style="margin: 0; font-size: 18px;">{{ $recapHeading }}</h2>
+                    <p class="muted" style="margin: 4px 0 0;">Ringkasan total & jumlah transaksi.</p>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                    <a href="{{ route('admin.dashboard.export', ['range' => $recapRange, 'length' => $recapLength]) }}" class="download-btn">
+                        Download Excel
+                    </a>
+                    <div class="recap-combo" id="recap-combo">
+                        <button type="button" class="recap-trigger" id="recap-combo-trigger">
+                            <span id="recap-combo-label">{{ $activeRecapLabel }}</span>
+                            <span class="chevron">▾</span>
+                        </button>
+                        <div class="recap-options" id="recap-option-list">
+                            @foreach ($recapOptionList as $option)
+                                <button type="button"
+                                    class="recap-option {{ $option['active'] ? 'active' : '' }}"
+                                    data-label="{{ $option['label'] }}"
+                                    data-url="{{ route('admin.dashboard', ['range' => $option['range'], 'length' => $option['length']]) }}">
+                                    {{ $option['label'] }}
+                                </button>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
             </div>
-            @if ($monthlyRecap->isEmpty())
-                <p class="muted" style="margin-top: 10px;">Belum ada data transaksi yang dapat diringkas.</p>
+            <span class="tag" style="margin-top: 8px; display: inline-flex;">{{ $recapBadge }}</span>
+            @if ($transactionRecap->isEmpty())
+                <p class="muted" style="margin-top: 10px;">Belum ada data transaksi pada rentang ini.</p>
             @else
                 <div class="table-scroll">
                     <table class="compact-table">
                         <thead>
                             <tr>
-                                <th>Bulan</th>
+                                <th>Periode</th>
                                 <th>Total</th>
                                 <th>Transaksi</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($monthlyRecap as $recap)
+                            @foreach ($transactionRecap as $recap)
                                 <tr>
                                     <td>{{ $recap['label'] }}</td>
                                     <td>Rp{{ number_format($recap['total'], 0, ',', '.') }}</td>
@@ -403,9 +531,9 @@
             }
 
             const canvas = document.getElementById('daily-sales-chart');
-            const labels = @json($dailySalesLabels);
-            const totals = @json($dailySalesTotals);
-            const counts = @json($dailySalesTransactionCounts);
+            const labels = @json($chartLabels);
+            const totals = @json($chartTotals);
+            const counts = @json($chartCounts);
 
             if (!canvas || !labels.length) {
                 return;
@@ -504,6 +632,39 @@
                     },
                 },
             });
+
+            const combo = document.getElementById('recap-combo');
+            const comboTrigger = document.getElementById('recap-combo-trigger');
+            const optionList = document.getElementById('recap-option-list');
+
+            if (combo && comboTrigger && optionList) {
+                const options = Array.from(optionList.querySelectorAll('.recap-option'));
+
+                const openList = () => optionList.classList.add('open');
+                const closeList = () => optionList.classList.remove('open');
+
+                comboTrigger.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    const isOpen = optionList.classList.contains('open');
+                    if (isOpen) {
+                        closeList();
+                    } else {
+                        openList();
+                    }
+                });
+
+                options.forEach((opt) => {
+                    opt.addEventListener('click', () => {
+                        window.location.href = opt.dataset.url;
+                    });
+                });
+
+                document.addEventListener('click', (event) => {
+                    if (!combo.contains(event.target)) {
+                        closeList();
+                    }
+                });
+            }
         });
     </script>
 @endpush
